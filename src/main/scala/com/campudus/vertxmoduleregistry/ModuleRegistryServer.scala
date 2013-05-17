@@ -17,7 +17,6 @@ import scala.util.Failure
 import org.vertx.java.core.eventbus.Message
 
 class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFutureHelpers {
-  import com.campudus.vertx.DefaultVertxExecutionContext._
 
   val FILE_SEP = File.separator
 
@@ -196,15 +195,13 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
           implicit val paramMap = PostRequestReader.dataToMap(buf.toString)
           implicit val errorBuffer = collection.mutable.ListBuffer[String]()
 
-          val url = getRequiredParam("downloadUrl", "Download URL missing")
+          val modName = getRequiredParam("modName", "Name of module missing")
 
           val errors = errorBuffer.result
           if (errors.isEmpty) {
             try {
-              val downloadUrl = new URI(url)
-
               (for {
-                module <- downloadExtractAndRegister(downloadUrl)
+                module <- downloadExtractAndRegister(modName)
                 json <- registerModule(vertx, module)
                 sent <- sendMailToModerators(module)
               } yield {
@@ -324,11 +321,28 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     }
   }
 
-  private def downloadExtractAndRegister(uri: URI): Future[Module] = {
+  private def createMavenURI(modName: String) = {
+    val uri = new StringBuilder("http://repo1.maven.org/maven2/")
+    val parts = modName.split('~')
+    if (parts.length != 3) {
+      throw new ModuleRegistryException("Must be in same format as 'io.vertx~mod-mongo-persistor~1.0'")
+    }
+    val group = parts(0)
+    val artifactId = parts(1)
+    val version = parts(2)
+    group.split("\\.").foreach(uri.append(_).append('/'))
+    uri.append(artifactId).append('/').append(version).append('/')
+    uri.append(artifactId).append('-').append(version).append(".zip")
+    new URI(uri.toString())
+  }
+
+  private def downloadExtractAndRegister(modName: String): Future[Module] = {
     val tempUUID = java.util.UUID.randomUUID()
     val tempFile = "module-" + tempUUID + ".tmp.zip"
-    val absPath = new File(tempFile).getAbsolutePath()
+    val absPath = new File(tempFile).getAbsolutePath
 
+    // TODO: Support bintray etc
+    val uri = createMavenURI(modName)
     for {
       file <- open(absPath)
       downloadedFile <- downloadInto(uri, file)
@@ -337,8 +351,8 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
       modJson <- open(modFileName)
       content <- readFileToString(modJson)
     } yield {
-      logger.info("got mod.json:\n" + content.toString())
-      val json = new JsonObject(content.toString()).putString("downloadUrl", uri.toString())
+      logger.info("got mod.json:\n" + content.toString)
+      val json = new JsonObject(content.toString).putString("modName", modName)
       logger.info("in json:\n" + json.encode())
       Module.fromModJson(json.putNumber("timeRegistered", System.currentTimeMillis())) match {
         case Some(module) => module

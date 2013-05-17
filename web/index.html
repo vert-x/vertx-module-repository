@@ -97,16 +97,16 @@
 					<p class="message">No info from server.</p>
 				</div>
 				<div id="registerFormContainer">
-					<p>Please provide the URL to your module so it can be verified.</p>
-          <p>If it's in Maven Central it will be something like: <pre>http://repo2.maven.org/maven2/io/vertx/your-mod/1.0/your-mod-1.0.zip</pre></p>
+					<p>Please provide the name of your  module so it can be verified.</p>
+          <p>This will look like <pre>io.vertx~mod-mongo-persistor~1.0</pre></p>
           <p>Please note that we don't accept SNAPSHOT releases.</p>
 					<form id="registerForm" action="/register" method="POST">
 						<div class="columns">
 							<div class="col left">
 								<fieldset class="reginfo">
 									<legend>Module information</legend>
-									<label for="downloadUrl"><span>Download URL</span> <input type="url"
-										id="registerFormDownloadUrl" name="downloadUrl" placeholder="URL for this module"
+									<label for="modName"><span>Module name</span> <input type="text"
+										id="registerFormModName" name="modname" placeholder="Name of the module"
 										required="required" /> </label>
 								</fieldset>
 							</div>
