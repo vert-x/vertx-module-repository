@@ -57,10 +57,6 @@ dependencies {
   // Libraries needed for scala api
   compile "org.scala-lang:scala-library:$scalaVersion"
 
-  // If you're creating Groovy compiled verticles you may need the following dependencies
-  // provided "org.codehaus.groovy:groovy-all:$groovyVersion"
-  // provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
-
 }
 
 test {
@@ -77,27 +73,28 @@ Please edit the details below.
  */
 def configurePom(def pom) {
   pom.project {
-    description 'Description of your module here'
+    description 'The Vert.x module registry'
     inceptionYear '2013'
     packaging 'zip'
-    url 'Your project url'
+    url 'http://vertx.io'
 
     developers {
       developer {
-        id 'developer id (e.g. github username)'
-        name 'developer name'
-        email 'developer email'
+        id 'Narigo'
+      }
+      developer {
+        id 'purplefox'
       }
     }
 
     scm {
-      url 'url to your repo - e.g. github repo url'
+      url 'https://github.com/vert-x/vertx-module-registry.git'
     }
 
     licenses {
       license {
-        name 'The name of the license used, e.g.: The Apache Software License, Version 2.0'
-        url 'URl to the license, e.g.: http://www.apache.org/licenses/LICENSE-2.0.txt'
+        name 'The Apache Software License, Version 2.0'
+        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
         distribution 'repo'
       }
     }

@@ -58,8 +58,6 @@ trait VertxFutureHelpers extends VertxScalaHelpers {
         client.close()
         promise.failure(new ModuleRegistryException("could not open " + uri + " on " + host + ":" + port))
       } else {
-        val buf = new Buffer(0)
-
         resp.dataHandler({ buffer: Buffer =>
           into.write(buffer)
         })

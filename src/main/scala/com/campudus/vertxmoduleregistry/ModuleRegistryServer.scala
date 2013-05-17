@@ -269,7 +269,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
                 vertx.fileSystem().exists(indexFile, {
                   exists: AsyncResult[java.lang.Boolean] =>
                     if (exists.succeeded() && exists.result) {
-                      logger.error("sending " + indexFile)
+                      logger.info("sending " + indexFile)
                       deliver(indexFile)
                     } else {
                       logger.error("could not find " + indexFile)

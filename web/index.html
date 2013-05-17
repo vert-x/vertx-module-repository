@@ -30,8 +30,8 @@
 		</div>
 		<div id="main">
 			<div class="intro">
-				<p>This is the Vert.x module registry. Here you can find all modules published by Vert.x
-					users.</p>
+				<p>Welcome to the Vert.x module registry. Here you can list and search for modules that have been submitted by the
+        Vert.x community.</p>
 			</div>
 			<div id="search">
 				<h2>Search</h2>
@@ -77,7 +77,6 @@
 					<ul>
 						<li><a href="http://vertx.io/"><img src="images/vertx.png" alt="GitHub" /></a></li>
 						<li><a href="http://campudus.com"><img src="images/campudus.png" alt="Campudus" /></a></li>
-						<li><a href="https://github.com/"><img src="images/github.png" alt="GitHub" /></a></li>
 					</ul>
 				</div>
 			</div>
@@ -85,7 +84,7 @@
 				<h2>Register your own module</h2>
 				<div class="intro">
 					<p>
-						To register your own module, simply fill out the <a class="showRegister href-less"
+						To register your own module, fill out the <a class="showRegister href-less"
 							href="/register">registration form</a>.
 					</p>
 				</div>
@@ -98,15 +97,16 @@
 					<p class="message">No info from server.</p>
 				</div>
 				<div id="registerFormContainer">
-					<p>Please fill in the fields and submit your module. You'll need to wait for a moderator to
-						approve your module. Feel free to ping us in IRC on Freenode.</p>
+					<p>Please provide the URL to your module so it can be verified.</p>
+          <p>If it's in Maven Central it will be something like: <pre>http://repo2.maven.org/maven2/io/vertx/your-mod/1.0/your-mod-1.0.zip</pre></p>
+          <p>Please note that we don't accept SNAPSHOT releases.</p>
 					<form id="registerForm" action="/register" method="POST">
 						<div class="columns">
 							<div class="col left">
 								<fieldset class="reginfo">
 									<legend>Module information</legend>
 									<label for="downloadUrl"><span>Download URL</span> <input type="url"
-										id="registerFormDownloadUrl" name="downloadUrl" placeholder="Download URL for this module"
+										id="registerFormDownloadUrl" name="downloadUrl" placeholder="URL for this module"
 										required="required" /> </label>
 								</fieldset>
 							</div>
@@ -117,7 +117,7 @@
 								</fieldset>
 							</div>
 						</div>
-						<button id="registerButton" type="submit">Submit for moderation</button>
+						<button id="registerButton" type="submit">Verify and submit for moderation</button>
 					</form>
 				</div>
 			</div>
