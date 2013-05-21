@@ -348,7 +348,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     val group = parts(0)
     val artifactId = parts(1)
     val version = parts(2)
-    if (version.toLowerCase().contains("snapshot")) {
+    if (version.toLowerCase().endsWith("snapshot")) {
       throw new ModuleRegistryException("No SNAPSHOTS are allowed for registration")
     }
     group.split("\\.").foreach(uri.append(_).append('/'))
