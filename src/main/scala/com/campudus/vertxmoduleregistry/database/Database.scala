@@ -109,8 +109,9 @@ Thanks!"""
       val description = obj.getString("description")
       val licenses = jsonArrayToStringList(obj.getArray("licenses"))
       val author = obj.getString("author")
-      val keywords = Option(jsonArrayToStringList(obj.getArray("keywords")))
-      val developers = Option(jsonArrayToStringList(obj.getArray("developers")))
+
+      val keywords =  Option(obj.getArray("keywords")) map jsonArrayToStringList
+      val developers =  Option(obj.getArray("developers")) map jsonArrayToStringList
       val homepage = Option(obj.getString("homepage"))
 
       val timeRegistered = obj.getLong("timeRegistered")
