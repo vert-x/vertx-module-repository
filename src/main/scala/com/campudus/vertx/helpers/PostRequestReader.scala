@@ -1,7 +1,6 @@
 package com.campudus.vertx.helpers
 
 import scala.collection.immutable.Map
-import org.vertx.java.core.buffer.Buffer
 
 /**
  * Helper object to read data from a HTTP-POST request.

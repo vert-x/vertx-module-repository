@@ -14,15 +14,11 @@ import com.campudus.vertx.Verticle
 import com.campudus.vertx.helpers.{ PostRequestReader, VertxFutureHelpers, VertxScalaHelpers }
 import com.campudus.vertxmoduleregistry.database.Database.{ Module, approve, latestApprovedModules, listModules, registerModule, remove, searchModules, unapproved }
 import com.campudus.vertxmoduleregistry.security.Authentication.{ authorise, login, logout }
-import org.vertx.java.core.file.AsyncFile
-import java.io.IOException
 import java.nio.file.Files
-import java.io.FileNotFoundException
 import org.vertx.java.core.file.FileSystemException
 import java.nio.file.NoSuchFileException
 
 class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFutureHelpers {
-  import com.campudus.vertx.DefaultVertxExecutionContext._
 
   val FILE_SEP = File.separator
 

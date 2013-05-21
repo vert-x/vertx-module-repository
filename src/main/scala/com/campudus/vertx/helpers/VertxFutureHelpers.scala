@@ -11,15 +11,9 @@ import org.vertx.java.core.json.JsonObject
 import com.campudus.vertx.Verticle
 import com.campudus.vertxmoduleregistry.ModuleRegistryStarter
 import com.campudus.vertxmoduleregistry.ModuleRegistryException
-import com.campudus.vertxmoduleregistry.ModuleRegistryException
-import com.campudus.vertxmoduleregistry.ModuleRegistryException
-import com.campudus.vertxmoduleregistry.ModuleRegistryException
-import com.campudus.vertxmoduleregistry.ModuleRegistryException
-import com.campudus.vertxmoduleregistry.ModuleRegistryException
 
 trait VertxFutureHelpers extends VertxScalaHelpers {
   this: Verticle =>
-  import com.campudus.vertx.DefaultVertxExecutionContext._
 
   private def futurify[T](doSomething: Promise[T] => Unit) = {
     val promise = Promise[T]

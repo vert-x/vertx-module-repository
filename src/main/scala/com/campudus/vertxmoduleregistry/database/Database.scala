@@ -10,7 +10,6 @@ import scala.concurrent.Future
 import java.util.UUID
 
 object Database extends VertxScalaHelpers {
-  import scala.collection.JavaConverters._
 
   val dbAddress = "registry.database"
   /*

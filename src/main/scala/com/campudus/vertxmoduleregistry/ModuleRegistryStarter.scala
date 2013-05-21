@@ -6,11 +6,7 @@ import org.vertx.java.core.json.JsonObject
 import com.campudus.vertx.helpers.VertxScalaHelpers
 import com.campudus.vertxmoduleregistry.database.Database
 import com.campudus.vertxmoduleregistry.security.Authentication
-import org.vertx.java.core.AsyncResultHandler
-import org.vertx.java.core.Handler
 import com.campudus.vertx.Verticle
-import scala.concurrent.duration._
-import scala.concurrent.Await
 import org.vertx.java.core.eventbus.Message
 
 class ModuleRegistryStarter extends Verticle with VertxScalaHelpers {
