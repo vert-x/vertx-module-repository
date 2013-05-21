@@ -225,7 +225,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
         implicit val paramMap = PostRequestReader.dataToMap(buf.toString)
         implicit val errorBuffer = collection.mutable.ListBuffer[String]()
 
-        val modName = getRequiredParam("modName", "Module name missing")
+        val modName = getRequiredParam("modName", "Module name missing").trim
 
         val errors = errorBuffer.result
         if (errors.isEmpty) {
