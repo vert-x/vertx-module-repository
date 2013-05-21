@@ -127,7 +127,7 @@ function createRegisterFormHandler() {
     $('#registerButton').attr('disabled', true);
     $('#registerButton').text('Checking validity of module...');
     $.post('/register', {
-      downloadUrl : $('#registerFormModName').val()
+      modName : $('#registerFormModName').val()
     }, processRegisterResult, 'json');
   });
 }
