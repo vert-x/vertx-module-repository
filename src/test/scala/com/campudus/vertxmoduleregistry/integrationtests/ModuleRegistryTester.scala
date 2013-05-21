@@ -26,7 +26,10 @@ class ModuleRegistryTester extends TestVerticle {
 
   val TEMP_DIR = System.getProperty("java.io.tmpdir")
   val FILE_SEP = File.separator
-  val validDownloadUrl: String = "https://oss.sonatype.org/content/groups/public/com/campudus/session-manager/2.0.0-beta0/session-manager-2.0.0-beta0.zip"
+  val validModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta2"
+  val invalidModName: String = "mod-mongo-persistor~2.0.0-beta2"
+  val snapshotModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta3-SNAPSHOT"
+
   val incorrectDownloadUrl: String = "http://asdfreqw/"
   val approverPw: String = "password"
 
@@ -51,8 +54,28 @@ class ModuleRegistryTester extends TestVerticle {
   }
 
   @Test
+  def testRegisterSnapshotMod() {
+    registerModule(snapshotModName) onComplete handleFailure { data =>
+      Option(data.getString("status")) match {
+        case Some("error") => testComplete()
+        case _ => fail("wrong status: " + data.encode())
+      }
+    }
+  }
+
+  @Test
+  def testRegisterInvalidMod() {
+    registerModule(invalidModName) onComplete handleFailure { data =>
+      Option(data.getString("status")) match {
+        case Some("error") => testComplete()
+        case _ => fail("wrong status: " + data.encode())
+      }
+    }
+  }
+
+  @Test
   def testRegisterMod() {
-    registerModule(validDownloadUrl) onComplete handleFailure { data =>
+    registerModule(validModName) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("ok") => testComplete()
         case _ => fail("wrong status / error reply: " + data.encode())
@@ -62,7 +85,7 @@ class ModuleRegistryTester extends TestVerticle {
 
   @Test
   def testRegisterModTwice() {
-    registerModule(validDownloadUrl) flatMap (_ => registerModule(validDownloadUrl)) onComplete handleFailure { data =>
+    registerModule(validModName) flatMap (_ => registerModule(validModName)) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("error") => testComplete()
         case _ => fail("should get an error reply, but got " + data.encode())
@@ -70,141 +93,141 @@ class ModuleRegistryTester extends TestVerticle {
     }
   }
 
-  @Test
-  def testDownloadingTimeout() {
-    val oldTimeout = ModuleRegistryStarter.standardDownloadTimeout
+ @Test
+ def testDownloadingTimeout() {
+   val oldTimeout = ModuleRegistryStarter.standardDownloadTimeout
 
-    ModuleRegistryStarter.standardDownloadTimeout = 10
-    registerModule(validDownloadUrl) onComplete handleFailure { data =>
-      Option(data.getString("status")) match {
-        case Some("error") =>
-          ModuleRegistryStarter.standardDownloadTimeout = oldTimeout
-          testComplete()
-        case _ =>
-          ModuleRegistryStarter.standardDownloadTimeout = oldTimeout
-          fail("should get an error reply, but got " + data.encode())
-      }
-    }
-  }
+   ModuleRegistryStarter.standardDownloadTimeout = 10
+   registerModule(validModName) onComplete handleFailure { data =>
+     Option(data.getString("status")) match {
+       case Some("error") =>
+         ModuleRegistryStarter.standardDownloadTimeout = oldTimeout
+         testComplete()
+       case _ =>
+         ModuleRegistryStarter.standardDownloadTimeout = oldTimeout
+         fail("should get an error reply, but got " + data.encode())
+     }
+   }
+ }
 
-  @Test
-  def testCleanupAfterRegister() {
-    registerModule(validDownloadUrl) flatMap (_ => checkIfZipExists zip checkIfTmpDirExists) onComplete handleFailure {
-      case (true, true) => fail("Zip file and temp dir should not be there anymore")
-      case (true, false) => fail("Zip file dir should not be there anymore")
-      case (false, true) => fail("Temp dir should not be there anymore")
-      case (false, false) => testComplete()
-    }
-  }
+ @Test
+ def testCleanupAfterRegister() {
+   registerModule(validModName) flatMap (_ => checkIfZipExists zip checkIfTmpDirExists) onComplete handleFailure {
+     case (true, true) => fail("Zip file and temp dir should not be there anymore")
+     case (true, false) => fail("Zip file dir should not be there anymore")
+     case (false, true) => fail("Temp dir should not be there anymore")
+     case (false, false) => testComplete()
+   }
+ }
 
-  @Test
-  def testDeleteModule() {
-    registerModule(validDownloadUrl) flatMap { obj =>
-      val modName = obj.getObject("data").getString("name")
-      println("registered " + modName + ", now delete it" + obj.encode)
-      deleteModule(modName)
-    } onComplete handleFailure { data =>
-      Option(data.getString("status")) match {
-        case Some("ok") => testComplete()
-        case _ => fail("wrong status on delete! " + data.encode)
-      }
-    }
-  }
+ @Test
+ def testDeleteModule() {
+   registerModule(validModName) flatMap { obj =>
+     val modName = obj.getObject("data").getString("name")
+     println("registered " + modName + ", now delete it" + obj.encode)
+     deleteModule(modName)
+   } onComplete handleFailure { data =>
+     Option(data.getString("status")) match {
+       case Some("ok") => testComplete()
+       case _ => fail("wrong status on delete! " + data.encode)
+     }
+   }
+ }
 
-  @Test
-  def testDeleteWithoutPassword() {
-    registerModule(validDownloadUrl) flatMap { obj =>
-      val modId = obj.getObject("data").getString("id")
-      val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
-      noExceptionInClient(client)
-      postJson(client, "/remove", "name" -> modId)
-    } onComplete handleFailure { data =>
-      Option(data.getString("status")) match {
-        case Some("error") => testComplete()
-        case _ => fail("Should not be able to delete a module id twice")
-      }
-    }
-  }
+ @Test
+ def testDeleteWithoutPassword() {
+   registerModule(validModName) flatMap { obj =>
+     val modId = obj.getObject("data").getString("id")
+     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+     noExceptionInClient(client)
+     postJson(client, "/remove", "name" -> modId)
+   } onComplete handleFailure { data =>
+     Option(data.getString("status")) match {
+       case Some("error") => testComplete()
+       case _ => fail("Should not be able to delete a module id twice")
+     }
+   }
+ }
 
-  @Test
-  def testDeleteModuleTwice() {
-    registerModule(validDownloadUrl) flatMap { obj =>
-      val modId = obj.getObject("data").getString("id")
-      deleteModule(modId) flatMap (_ => deleteModule(modId))
-    } onComplete handleFailure { data =>
-      Option(data.getString("status")) match {
-        case Some("error") => testComplete()
-        case _ => fail("Should not be able to delete a module id twice")
-      }
-    }
-  }
+ @Test
+ def testDeleteModuleTwice() {
+   registerModule(validModName) flatMap { obj =>
+     val modId = obj.getObject("data").getString("id")
+     deleteModule(modId) flatMap (_ => deleteModule(modId))
+   } onComplete handleFailure { data =>
+     Option(data.getString("status")) match {
+       case Some("error") => testComplete()
+       case _ => fail("Should not be able to delete a module id twice")
+     }
+   }
+ }
 
-  @Test
-  def testDeleteMissingModule() {
-    deleteModule("some-missing-id") onComplete handleFailure { data =>
-      Option(data.getString("status")) match {
-        case Some("error") => testComplete()
-        case x => fail("Should not be able to delete a module that doesn't exist " + x)
-      }
-    }
-  }
+ @Test
+ def testDeleteMissingModule() {
+   deleteModule("some-missing-id") onComplete handleFailure { data =>
+     Option(data.getString("status")) match {
+       case Some("error") => testComplete()
+       case x => fail("Should not be able to delete a module that doesn't exist " + x)
+     }
+   }
+ }
 
-  @Test
-  def testListAllModules() {
-    registerModule(validDownloadUrl) flatMap (_ => registerModule(validDownloadUrl)) flatMap { _ =>
-      val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
-      noExceptionInClient(client)
+ @Test
+ def testListAllModules() {
+   registerModule(validModName) flatMap (_ => registerModule(validModName)) flatMap { _ =>
+     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+     noExceptionInClient(client)
 
-      getJson(client, "/list")
-    } onComplete handleFailure { obj =>
-      Option(obj.getArray("modules")) match {
-        case Some(results) => testComplete()
-        case None => fail("should get results but got none")
-      }
-    }
-  }
+     getJson(client, "/list")
+   } onComplete handleFailure { obj =>
+     Option(obj.getArray("modules")) match {
+       case Some(results) => testComplete()
+       case None => fail("should get results but got none")
+     }
+   }
+ }
 
-  @Test
-  def testLogin() {
-    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
-    noExceptionInClient(client)
+ @Test
+ def testLogin() {
+   val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+   noExceptionInClient(client)
 
-    postJson(client, "/login", "password" -> approverPw) map { obj =>
-      assertNotNull("Should receive a working session id", obj.getString("sessionID"))
-      testComplete()
-    }
-  }
+   postJson(client, "/login", "password" -> approverPw) map { obj =>
+     assertNotNull("Should receive a working session id", obj.getString("sessionID"))
+     testComplete()
+   }
+ }
 
-  @Test
-  def testLogout() {
-    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
-    noExceptionInClient(client)
+ @Test
+ def testLogout() {
+   val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+   noExceptionInClient(client)
 
-    postJson(client, "/login", "password" -> approverPw) flatMap { obj =>
-      val sessionId = obj.getString("sessionID")
-      assertNotNull("Should receive a working session id", sessionId)
-      postJson(client, "/logout", "sessionID" -> sessionId)
-    } onComplete handleFailure { res =>
-      Option(res.getString("status")) match {
-        case Some("ok") => testComplete()
-        case _ => fail("got an error logging out!" + res.encode)
-      }
-    }
-  }
+   postJson(client, "/login", "password" -> approverPw) flatMap { obj =>
+     val sessionId = obj.getString("sessionID")
+     assertNotNull("Should receive a working session id", sessionId)
+     postJson(client, "/logout", "sessionID" -> sessionId)
+   } onComplete handleFailure { res =>
+     Option(res.getString("status")) match {
+       case Some("ok") => testComplete()
+       case _ => fail("got an error logging out!" + res.encode)
+     }
+   }
+ }
 
-  @Test
-  def testLogoutWithWrongSessionId() {
-    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
-    noExceptionInClient(client)
+ @Test
+ def testLogoutWithWrongSessionId() {
+   val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+   noExceptionInClient(client)
 
-    postJson(client, "/logout", "sessionID" -> "wrong-session-id") map { res =>
-      Option(res.getString("status")) match {
-        case Some("ok") => fail("Should not be able to logout with wrong session-id! " + res.encode)
-        case Some("error") => testComplete()
-        case _ => fail("Should get a status reply but got " + res.encode)
-      }
-    }
-  }
+   postJson(client, "/logout", "sessionID" -> "wrong-session-id") map { res =>
+     Option(res.getString("status")) match {
+       case Some("ok") => fail("Should not be able to logout with wrong session-id! " + res.encode)
+       case Some("error") => testComplete()
+       case _ => fail("Should get a status reply but got " + res.encode)
+     }
+   }
+ }
 
   private def handleFailure[T](doSth: T => Unit): Function1[Try[T], Any] = {
     case Success(x) => doSth(x)
@@ -248,11 +271,11 @@ class ModuleRegistryTester extends TestVerticle {
     }
   }
 
-  private def registerModule(modUrl: String): Future[JsonObject] = {
+  private def registerModule(modName: String): Future[JsonObject] = {
     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
     noExceptionInClient(client)
 
-    postJson(client, "/register", "downloadUrl" -> modUrl)
+    postJson(client, "/register", "modName" -> modName)
   }
 
   private def noExceptionInClient(client: HttpClient) = client.exceptionHandler({ ex: Throwable =>

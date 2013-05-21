@@ -23,7 +23,7 @@ function getLiFromMods(modules) {
       time = item.timeRegistered;
     }
     items += '<li class="mod" id="' + item._id + '"><div class="modname"><span class="date">'
-        + formatTimestamp(time) + '</span> - <a href="' + item.downloadUrl + '">' + item.name
+        + formatTimestamp(time) + '</span> - <a href="' + item.modName + '">' + item.name
         + '</a>' + additional + '</div></li>';
   }
   items += '</ul>';
@@ -127,7 +127,7 @@ function createRegisterFormHandler() {
     $('#registerButton').attr('disabled', true);
     $('#registerButton').text('Checking validity of module...');
     $.post('/register', {
-      downloadUrl : $('#registerFormDownloadUrl').val()
+      downloadUrl : $('#registerFormModName').val()
     }, processRegisterResult, 'json');
   });
 }

@@ -225,15 +225,13 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
         implicit val paramMap = PostRequestReader.dataToMap(buf.toString)
         implicit val errorBuffer = collection.mutable.ListBuffer[String]()
 
-        val url = getRequiredParam("downloadUrl", "Download URL missing")
+        val modName = getRequiredParam("modName", "Module name missing")
 
         val errors = errorBuffer.result
         if (errors.isEmpty) {
           try {
-            val downloadUrl = new URI(url)
-
             (for {
-              module <- downloadExtractAndRead(downloadUrl)
+              module <- downloadExtractAndRead(modName)
               json <- registerModule(vertx, module)
               sent <- sendMailToModerators(module)
             } yield {
@@ -247,7 +245,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
             }
           } catch {
             case e: Exception =>
-              respondFailed("Download URL could not be parsed" + e.getMessage())
+              respondFailed("Module name could not be parsed" + e.getMessage())
           }
         } else {
           respondErrors(errors)
@@ -341,6 +339,24 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     logger.info("started module registry server")
   }
 
+  private def createUri(modName: String) = {
+    val uri = new StringBuilder("http://repo1.maven.org/maven2/")
+    val parts = modName.split('~')
+    if (parts.length != 3) {
+      throw new ModuleRegistryException("Must be in same format as 'io.vertx~mod-mongo-persistor~1.0'")
+    }
+    val group = parts(0)
+    val artifactId = parts(1)
+    val version = parts(2)
+    if (version.toLowerCase().contains("snapshot")) {
+      throw new ModuleRegistryException("No SNAPSHOTS are allowed for registration")
+    }
+    group.split("\\.").foreach(uri.append(_).append('/'))
+    uri.append(artifactId).append('/').append(version).append('/')
+    uri.append(artifactId).append('-').append(version).append(".zip")
+    new URI(uri.toString())
+  }
+
   override def stop() {
     logger.info("stopped module registry server")
   }
@@ -365,12 +381,15 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     }
   }
 
-  private def downloadExtractAndRead(uri: URI): Future[Module] = {
+  private def downloadExtractAndRead(modName: String): Future[Module] = {
+    val uri = createUri(modName)
+
     val tempUUID = java.util.UUID.randomUUID()
     val tempFile = "module-" + tempUUID + ".tmp.zip"
     val absPath = File.createTempFile("module-", tempUUID + ".tmp.zip").getAbsolutePath()
     val tempDir = Files.createTempDirectory("vertx-" + tempUUID.toString())
     val destDir = tempDir.toAbsolutePath().toString()
+
 
     val futureModule = for {
       file <- open(absPath)
@@ -381,7 +400,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
       content <- readFileToString(modJson)
     } yield {
       logger.info("got mod.json:\n" + content.toString())
-      val json = new JsonObject(content.toString()).putString("downloadUrl", uri.toString())
+      val json = new JsonObject(content.toString()).putString("name", modName)
       logger.info("in json:\n" + json.encode())
       Module.fromModJson(json.putNumber("timeRegistered", System.currentTimeMillis())) match {
         case Some(module) => module
