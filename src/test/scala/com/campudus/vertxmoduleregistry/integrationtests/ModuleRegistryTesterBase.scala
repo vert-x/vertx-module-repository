@@ -18,8 +18,9 @@ import java.io.File
 
 abstract class ModuleRegistryTesterBase extends TestVerticle {
 
-  val TEMP_DIR = System.getProperty("java.io.tmpdir")
   val FILE_SEP = File.separator
+  val TEMP_DIR = System.getProperty("java.io.tmpdir")
+
   val validModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta2"
   val invalidModName: String = "mod-mongo-persistor~2.0.0-beta2"
   val snapshotModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta3-SNAPSHOT"
@@ -28,6 +29,11 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
   val approverPw: String = "password"
 
   override def start(startedResult: org.vertx.java.core.Future[Void]) {
+    // clean up temp files and directory
+    val dirContent = readDir(TEMP_DIR)
+    dirContent.map( array => array.filter(isModule).foreach(new File(_).delete()))
+    dirContent.map( array => array.filter(isTemporaryDir).foreach(new File(_).delete()))
+
     container.deployModule(System.getProperty("vertx.modulename"),
       createJson(),
       new Handler[AsyncResult[String]]() {
@@ -68,15 +74,23 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
     p.future
   }
 
+  private def isModule(element: String) = {
+    element.startsWith(TEMP_DIR + FILE_SEP + "module-") && element.endsWith(".zip")
+  }
+
+  private def isTemporaryDir(element: String) = {
+    element.startsWith(TEMP_DIR + FILE_SEP + "vertx-")
+  }
+
   protected def checkIfZipExists(): Future[Boolean] = {
     readDir(TEMP_DIR) map { array =>
-      array.exists(element => (element.startsWith("module-") && element.endsWith(".zip")))
+      array.exists(isModule)
     }
   }
 
   protected def checkIfTmpDirExists(): Future[Boolean] = {
     readDir(TEMP_DIR) map { array =>
-      array.exists(element => (element.startsWith(TEMP_DIR + FILE_SEP + "vertx-")))
+      array.exists(isTemporaryDir)
     }
   }
 
