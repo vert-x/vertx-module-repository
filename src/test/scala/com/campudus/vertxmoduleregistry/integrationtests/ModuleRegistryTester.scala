@@ -30,17 +30,21 @@ class ModuleRegistryTester extends TestVerticle {
   val incorrectDownloadUrl: String = "http://asdfreqw/"
   val approverPw: String = "password"
 
-  override def start() {
+  override def start(startedResult: org.vertx.java.core.Future[Void]) {
     container.deployModule(System.getProperty("vertx.modulename"),
       json.putString("approver-password", approverPw),
       new Handler[AsyncResult[String]]() {
         override def handle(deploymentID: AsyncResult[String]) {
-          assertNotNull("deploymentID should not be null", deploymentID)
-
           initialize()
-          resetMongoDb map (_ => startTests()) recover {
-            case ex =>
-              fail(ex.getMessage() + " - " + ex.getCause())
+
+          assertNotNull("deploymentID should not be null", deploymentID.succeeded())
+
+          resetMongoDb().onComplete {
+            case Success(result) => {
+              startTests()
+              startedResult.setResult(null)
+            }
+            case Failure(t) => startedResult.setFailure(t)
           }
         }
       })
@@ -262,7 +266,10 @@ class ModuleRegistryTester extends TestVerticle {
         try {
           p.success(new JsonObject(buf.toString()))
         } catch {
-          case e: Throwable => p.failure(e)
+          case e: Throwable => {
+            e.printStackTrace()
+            p.failure(e)
+          }
         }
       })
     })
