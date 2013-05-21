@@ -339,7 +339,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     logger.info("started module registry server")
   }
 
-  private def createUri(modName: String) = {
+  private def createMavenUri(modName: String) = {
     val uri = new StringBuilder("http://repo1.maven.org/maven2/")
     val parts = modName.split('~')
     if (parts.length != 3) {
@@ -382,14 +382,12 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
   }
 
   private def downloadExtractAndRead(modName: String): Future[Module] = {
-    val uri = createUri(modName)
+    val uri = createMavenUri(modName)
 
     val tempUUID = java.util.UUID.randomUUID()
-    val tempFile = "module-" + tempUUID + ".tmp.zip"
     val absPath = File.createTempFile("module-", tempUUID + ".tmp.zip").getAbsolutePath()
     val tempDir = Files.createTempDirectory("vertx-" + tempUUID.toString())
     val destDir = tempDir.toAbsolutePath().toString()
-
 
     val futureModule = for {
       file <- open(absPath)
