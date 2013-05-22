@@ -289,6 +289,11 @@ p {
 	display: none;
 }
 
-#search #searchResultContainer {
+#searchResultContainer {
 	display: none;
+}
+
+#searchResults ul {
+	list-style-type: none;
+	text-align: left;
 }
