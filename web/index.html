@@ -46,6 +46,14 @@
 						</fieldset>
 					</form>
 				</div>
+        <div id="listAllModules">
+          <form action="/list" method="post" id="listForm">
+            <fieldset>
+              <legend>List all modules</legend>
+              <button id="listButton" type="submit">List All Modules</button>
+            </fieldset>
+          </form>
+        </div>
 				<div id="searchResultContainer">
 					<h2>Search results</h2>
 					<div id="searchResults"></div>
@@ -93,12 +101,13 @@
 					<p class="message">No info from server.</p>
 				</div>
 				<div class="info">
-					<h3>Module successfully registered!</h3>
+					<h3>Module has been submitted for moderation!</h3>
 					<p class="message">No info from server.</p>
 				</div>
 				<div id="registerFormContainer">
-					<p>Please provide the name of your module so it can be verified..</p>
-          <p>This will look like <pre>io.vertx~mod-mongo-persistor~1.0</pre></p>
+					<p>Please provide the identifier of your module so it can be verified..</p>
+          <p>This will look like <pre>com.yourcompany~your-module-name~your-module-version</pre></p>
+          <p>For example <pre>com.yourcompany~foo-mod~1.2</pre></p>
           <p>Please note that we don't accept SNAPSHOT releases.</p>
 					<form id="registerForm" action="/register" method="POST">
 						<div class="columns">
@@ -108,6 +117,16 @@
 									<label for="modName"><span>Module name</span> <input type="text"
 										id="registerFormModName" name="modName" placeholder="Name of the  module"
 										required="required" /> </label>
+
+                  <label for="modLocation"><span>Where is your module?</span>
+                    Maven Central<input type="radio"
+                    id="registerFormModLocation" name="modLocation" value="Maven Central" placeholder="Name of the  module"
+                    required="required" />
+                    Bintray<input type="radio"
+                           id="registerFormModLocation" name="modLocation" value="Bintray" placeholder="Name of the  module"
+                           required="required" />
+                    Other<input type="url" id="registerFormModURL" name="modURL"/>
+                  </label>
 								</fieldset>
 							</div>
 							<div class="col right">

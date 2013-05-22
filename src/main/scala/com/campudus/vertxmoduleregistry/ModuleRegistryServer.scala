@@ -35,6 +35,13 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     }
   }
 
+  private def getOptionalParam(param: String)(implicit paramMap: Map[String, String]) = {
+    paramMap.get(param) match {
+      case None => None
+      case Some(str) => URLDecoder.decode(str, "utf-8")
+    }
+  }
+
   def isAuthorised(vertx: Vertx, sessionID: String): Future[Boolean] = {
     val p = Promise[Boolean]
 
@@ -226,12 +233,18 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
         implicit val errorBuffer = collection.mutable.ListBuffer[String]()
 
         val modName = getRequiredParam("modName", "Module name missing").trim
+        val modLocation = getOptionalParam("modLocation")
+        val modURL = getOptionalParam("modURL")
+
+        println("modName is " + modName)
+        println("modLocation is " + modLocation)
+        println("modURL is " + modURL)
 
         val errors = errorBuffer.result
         if (errors.isEmpty) {
           try {
             (for {
-              module <- downloadExtractAndRead(modName)
+              module <- downloadExtractAndRead(modName, modLocation, modURL)
               json <- registerModule(vertx, module)
               sent <- sendMailToModerators(module)
             } yield {
@@ -381,7 +394,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     }
   }
 
-  private def downloadExtractAndRead(modName: String): Future[Module] = {
+  private def downloadExtractAndRead(modName: String, modLocation: String, modURL: String): Future[Module] = {
     val uri = createMavenUri(modName)
 
     val tempUUID = java.util.UUID.randomUUID()

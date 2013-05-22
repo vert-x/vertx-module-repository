@@ -73,6 +73,26 @@ function createSearchFormSubmitHandler() {
   });
 }
 
+function createListFormSubmitHandler() {
+  $('#listForm').submit(function(event) {
+    event.preventDefault();
+    $('#listButton').attr('disabled', true);
+    $('#listButton').text('Retrieving List ...');
+    $.get('/list', {
+    }, function(data) {
+      $('#listButton').attr('disabled', false);
+      $('#listButton').text('List All Modules');
+      $('#searchResults').empty();
+      if ($.isEmptyObject(data.modules)) {
+        $('#searchResults').append('<p>Sorry, I couldn\'t find anything :(</p>');
+      } else {
+        $('#searchResults').append(getLiFromMods(data.modules));
+      }
+      $('#searchResultContainer').show();
+    }, 'json');
+  });
+}
+
 function createRegisterFormHandler() {
   function showRegisterForm() {
     $('#registerFormContainer').show();
@@ -127,7 +147,9 @@ function createRegisterFormHandler() {
     $('#registerButton').attr('disabled', true);
     $('#registerButton').text('Checking validity of module...');
     $.post('/register', {
-      modName : $('#registerFormModName').val()
+      modName : $('#registerFormModName').val(),
+      modLocation: $('#registerFormModLocation').val(),
+      modURL: $('#registerFormModURL').val()
     }, processRegisterResult, 'json');
   });
 }
@@ -373,5 +395,6 @@ $(document).ready(function() {
   createUnapprovedModsHandler();
   fillLatestApprovedMods();
   createSearchFormSubmitHandler();
+  createListFormSubmitHandler();
   fillName();
 });

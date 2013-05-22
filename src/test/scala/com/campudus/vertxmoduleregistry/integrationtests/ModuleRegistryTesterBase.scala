@@ -100,7 +100,6 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
 
     postJson(client, "/login", "password" -> approverPw) flatMap { obj =>
       val sessionId = obj.getString("sessionID")
-      println("got login " + obj.encode)
       postJson(client, "/remove", "sessionID" -> sessionId, "name" -> modName)
     }
   }

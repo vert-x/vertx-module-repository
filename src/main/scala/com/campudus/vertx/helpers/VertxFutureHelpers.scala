@@ -57,7 +57,6 @@ trait VertxFutureHelpers extends VertxScalaHelpers {
         resp.dataHandler({ buffer: Buffer =>
           into.write(buffer)
           val tookTime = System.currentTimeMillis() - startedAt
-          logger.info("download-time: " + tookTime)
           if (tookTime > getContainer().config().getLong("download-timeout", ModuleRegistryStarter.standardDownloadTimeout)) {
             client.close()
             into.close()
