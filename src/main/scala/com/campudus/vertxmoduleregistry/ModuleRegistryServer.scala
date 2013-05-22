@@ -38,7 +38,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
   private def getOptionalParam(param: String)(implicit paramMap: Map[String, String]) = {
     paramMap.get(param) match {
       case None => None
-      case Some(str) => URLDecoder.decode(str, "utf-8")
+      case Some(str) => Option(URLDecoder.decode(str, "utf-8"))
     }
   }
 
@@ -394,7 +394,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     }
   }
 
-  private def downloadExtractAndRead(modName: String, modLocation: String, modURL: String): Future[Module] = {
+  private def downloadExtractAndRead(modName: String, modLocation: Option[String], modURL: Option[String]): Future[Module] = {
     val uri = createMavenUri(modName)
 
     val tempUUID = java.util.UUID.randomUUID()
