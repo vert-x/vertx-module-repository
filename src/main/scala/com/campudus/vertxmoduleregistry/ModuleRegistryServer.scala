@@ -448,7 +448,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
 
     val uri = modLocation match {
       case Some("mavenCentral") => createMavenCentralUri(group, artifact, version)
-      case Some("mavenCustom") => modURL match {
+      case Some("mavenOther") => modURL match {
         case Some(prefix) => createMavenUri(prefix, group, artifact, version)
         case None => throw new ModuleRegistryException("Prefix for custom maven repository missing!")
       }

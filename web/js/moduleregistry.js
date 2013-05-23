@@ -1,6 +1,6 @@
 var entriesPerPage, errorDialog, lastSearch, moduleCount, processSearchResults, searchMaxModules, searchPage, sessionID;
 
-entriesPerPage = 50;
+entriesPerPage = 4;
 searchPage = 0;
 
 function showDialog(dialog, text, refreshSearch) {
