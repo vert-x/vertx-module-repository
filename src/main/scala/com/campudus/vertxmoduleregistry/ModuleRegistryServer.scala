@@ -230,13 +230,13 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
         implicit val errorBuffer = collection.mutable.ListBuffer[String]()
 
         val query = getRequiredParam("query", "Cannot search with empty keywords")
-        val by = Option(req.params().get("by"))
-        val desc = Option(req.params().get("desc")) match {
+        val by = getOptionalParam("by")
+        val desc = getOptionalParam("desc") match {
           case Some("1") => true
           case _ => false
         }
-        val limit = Option(req.params().get("limit")) flatMap toInt
-        val skip = Option(req.params().get("skip")) flatMap toInt
+        val limit = getOptionalParam("limit") flatMap toInt
+        val skip = getOptionalParam("skip") flatMap toInt
 
         val errors = errorBuffer.result
         if (errors.isEmpty) {

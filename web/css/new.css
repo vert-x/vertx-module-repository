@@ -1,8 +1,8 @@
 /* Dialog */
 .dialog {
-	background: #333;
-	border: 1px solid #fff;
-	color: #fff;
+	background: #FFF;
+	border: 1px solid #445561;
+	color: #445561;
 	display: none;
 	padding: 10px;
 	position: fixed;
@@ -11,7 +11,6 @@
 	width: 400px;
 	margin-left: -200px;
 	z-index: 99999;
-	margin-left: -200px;
 	border-radius: 15px;
 }
 
@@ -29,8 +28,8 @@
 }
 
 #errorDialog {
-	background-color: #faa;
-	border-color: #f33;
+	background-color: #B46C6C;
+	border-color: #B40000;
 	border-radius: 15px;
 	color: #000;
 }
@@ -48,38 +47,89 @@
 }
 
 #loginDialog button {
+	margin-top: 15px;
 	width: 100%;
+}
+
+#loginDialog .text {
+	color: #610000;
 }
 
 /* Regular styling */
 body {
 	margin: 0 5%;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: 'Source Sans Pro';
+	color: #445561;
 }
 
 button {
 	background-color: #006DB4;
 	border-color: #FFF;
-	border-radius: 3px 3px 3px 3px;
+	border-radius: 3px;
 	border-width: 0px;
 	color: #FFF;
-	font-weight: bold;
+	font-size: 16px;
+	font-weight: 700;
 	padding: 5px 10px;
 }
 
 button:disabled {
-	background-color: #006DB4;
-	color: #000;
-}
-
-input[type="text"] {
-	border: 1px solid #000;
-	padding: 4px;
+	background-color: #87A2B4;
+	color: #FFF;
 }
 
 a {
 	color: #006DB4;
 	text-decoration: none;
+}
+
+h1,h2,h3,h4 {
+	color: #006DB4;
+	font-weight: 300;
+}
+
+h1 {
+	font-size: 42px;
+}
+
+h2 {
+	font-size: 24px;
+}
+
+h3 {
+	font-size: 20px;
+}
+
+fieldset {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+
+fieldset legend {
+	font-weight: bold;
+}
+
+::-webkit-input-placeholder {
+	color: #bbb;
+}
+
+:-moz-placeholder {
+	color: #bbb;
+}
+
+::-moz-placeholder {
+	color: #bbb;
+}
+
+:-ms-input-placeholder {
+	color: #bbb;
+}
+
+input[type="text"],input[type="url"],input[type="number"] {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 4px;
+	box-shadow: 1px 1px 5px #DFDFDF inset;
 }
 
 #header {
@@ -95,6 +145,8 @@ a {
 #search {
 	position: relative;
 	border-bottom: 1px solid #ccc;
+	padding-bottom: 20px;
+	margin-bottom: 15px;
 }
 
 #searchControls {
@@ -102,8 +154,15 @@ a {
 }
 
 #searchedForText {
+	display: block;
 	padding: 5px;
 	border-bottom: 1px solid #ccc;
+}
+
+#searchedForText.loading {
+	background-image: url("../images/loading.gif");
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
 #resultControls {
@@ -112,7 +171,18 @@ a {
 }
 
 #pagerControls {
-	margin: 15px 15px 15px 0;
+	margin: 15px 15px 0 0;
+	text-align: center;
+}
+
+#pagerPage {
+	display: inline;
+}
+
+#pagerPage input {
+	width: 30px;
+	padding: 3px;
+	text-align: center;
 }
 
 #results ul {
@@ -122,13 +192,13 @@ a {
 }
 
 #results>ul {
-	border-bottom: 1px solid #aaa;
+	border-bottom: 1px dotted #445561;
 }
 
 #results>ul>li {
 	cursor: pointer;
 	padding: 5px;
-	border-top: 1px solid #aaa;
+	border-top: 1px dotted #445561;
 	padding: 5px;
 }
 
@@ -153,11 +223,12 @@ a {
 }
 
 #results .extraInfos {
-	background-color: #fff;
-	padding: 10px;
 	margin: 10px;
-	border: 1px solid #aaa;
+	border: 1px solid #445561;
+	background-color: #fff;
 	border-radius: 5px;
+	padding: 10px;
+	box-shadow: 0 0 10px #DFDFDF inset;
 }
 
 #results .extraInfos .key {
@@ -168,9 +239,16 @@ a {
 	float: right;
 }
 
-#results .extraInfos .infoPart {
+#results .extraInfos .infoPart:nth-child(odd) {
 	border-radius: 0;
-	border-bottom: 1px dotted #aaa;
+	border-bottom: 1px dotted #999;
+}
+
+#results .extraInfos .infoPart:nth-child(even) {
+	background-color: #fcfcfc;
+	border-radius: 0;
+	border-bottom: 1px dotted #999;
+	border-radius: 0;
 }
 
 #results .extraInfos .infoPart:after {
@@ -182,18 +260,38 @@ a {
 }
 
 #results>ul>li:nth-child(odd) {
-	background-color: #eee;
+	background-color: #FAFAFA;
 }
 
 #results>ul>li:nth-child(even) {
-	background-color: #ddd;
+	background-color: #F0F0F0;
+}
+
+#registerForm .help .controls {
+	float: right;
+}
+
+#registerForm .help:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+#registerForm .col {
+	width: 33%;
 }
 
 #registerForm input[type="text"],#registerForm input[type="url"] {
 	display: block;
-	width: 95%;
-	left: 0;
-	right: 0;
+	width: 100%;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin-right: 30px;
+	margin-bottom: 5px;
 }
 
 #registerForm ul {
@@ -202,23 +300,35 @@ a {
 	padding: 0;
 }
 
+#registerForm li {
+	display: block;
+}
+
 #registerForm button {
-	width: 33%;
+	width: 250px;
 }
 
 #footer {
-	font-size: 10px;
+	margin-top: 20px;
+	border-top: 1px solid #DBDBDB;
+	color: #888;
+	font: 12px/1.5em Arial, sans-serif;
+	text-align: center;
+	border-top: 1px solid #DBDBDB;
 }
 
 #footer ul {
 	list-style-type: none;
+	display: inline-block;
 	margin: 0;
 	padding: 0;
+	margin: 0;
 }
 
 #footer ul li {
 	float: left;
 	margin: 15px;
+	margin-right: 40px;
 }
 
 #footer ul:after {
@@ -227,6 +337,10 @@ a {
 	height: 15px;
 	clear: both;
 	visibility: hidden;
+}
+
+#footer .randomName {
+	cursor: pointer;
 }
 
 div .help {
@@ -240,16 +354,16 @@ div .help .controls {
 div .help .text {
 	margin: 10px;
 	padding: 5px;
-	border: 1px solid #bbb;
-	background-color: #ddd;
+	border: 1px solid #DBDBDB;
+	background-color: #fff;
 	border-radius: 5px;
 	padding: 5px;
+	box-shadow: 0 0 10px #DFDFDF inset;
 }
 
 .col {
 	display: inline-block;
 	vertical-align: top;
-	width: 33%;
 }
 
 .columns:after {
@@ -261,7 +375,7 @@ div .help .text {
 }
 
 /* Hide stuff */
-.dialog,.template,.authed,.error,.extraInfos,.help .text {
+.dialog,.template,.authed,.error,.extraInfos,.noResults,.help .text {
 	display: none;
 }
 

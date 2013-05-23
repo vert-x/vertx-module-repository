@@ -1,6 +1,6 @@
-var entriesPerPage, errorDialog, lastSearch, moduleCount, processSearchResults, searchPage, sessionID;
+var entriesPerPage, errorDialog, lastSearch, moduleCount, processSearchResults, searchMaxModules, searchPage, sessionID;
 
-entriesPerPage = 2;
+entriesPerPage = 50;
 searchPage = 0;
 
 function showDialog(dialog, text, refreshSearch) {
@@ -14,7 +14,7 @@ function showDialog(dialog, text, refreshSearch) {
     jqDialog.find('.text').hide();
   }
   if (!!refreshSearch) {
-    searchIt(lastSearch);
+    searchIt(lastSearch, true);
   }
 }
 
@@ -70,15 +70,32 @@ function formatTime(time) {
   return time;
 }
 
-function searchIt(query) {
-  console.log('search for: ' + JSON.stringify(query));
+function searchIt(query, searchUpdated) {
+  $('#searchedForText').addClass('loading');
   lastSearch = query;
   lastSearch.params.limit = entriesPerPage;
   lastSearch.params.skip = searchPage * entriesPerPage;
-  if (query.method === 'post') {
-    $.post(query.url, query.params, processSearchResults(query.title), 'json');
+
+  var getStuff = function() {
+    if (query.method === 'post') {
+      $.post(query.url, lastSearch.params, processSearchResults(query.title), 'json');
+    } else {
+      $.getJSON(query.url, lastSearch.params, processSearchResults(query.title));
+    }
+  };
+
+  if (!searchUpdated) {
+    getStuff();
   } else {
-    $.getJSON(query.url, query.params, processSearchResults(query.title));
+    $.getJSON('/count', query.params, function(reply) {
+      if (reply.status === 'ok') {
+        searchMaxModules = reply.count;
+      } else {
+        searchMaxModules = moduleCount;
+      }
+      validSearchPage(searchPage);
+      getStuff();
+    });
   }
 }
 
@@ -93,10 +110,30 @@ function countModules() {
       } else {
         moduleCount = 0;
       }
-      mc.text(moduleCount);
+      $('#moduleCount').text(moduleCount);
     });
   });
   mc.click();
+}
+
+function validSearchPage(a) {
+  var firstPage = 0
+  var lastPage = Math.max(0, Math.ceil(searchMaxModules / entriesPerPage) - 1);
+  searchPage = Math.max(firstPage, Math.min(lastPage, a));
+  if (searchPage === firstPage) {
+    $('#pagerLeft').attr('disabled', true);
+  } else {
+    $('#pagerLeft').attr('disabled', false);
+  }
+  if (searchPage === lastPage) {
+    $('#pagerRight').attr('disabled', true);
+  } else {
+    $('#pagerRight').attr('disabled', false);
+  }
+
+  $('#pagerPage input').val(searchPage + 1);
+
+  return searchPage;
 }
 
 function authentication() {
@@ -197,39 +234,28 @@ function searching() {
         'by' : sortBy,
         'desc' : desc
       }
-    });
+    }, true);
   });
-
-  function validSearchPage(a) {
-    var min = 0
-    var max = Math.max(0, (moduleCount / entriesPerPage) - 1);
-    searchPage = Math.max(min, Math.min(max, a));
-    if (searchPage === min) {
-      $('#pagerLeft').attr('disabled', true);
-    } else {
-      $('#pagerLeft').attr('disabled', false);
-    }
-    if (searchPage === max) {
-      $('#pagerRight').attr('disabled', true);
-    } else {
-      $('#pagerRight').attr('disabled', false);
-    }
-    return searchPage;
-  }
 
   $('#pagerLeft').click(function(e) {
     e.preventDefault();
     searchPage = validSearchPage(searchPage - 1);
-    searchIt(lastSearch);
+    searchIt(lastSearch, false);
   });
 
   $('#pagerRight').click(function(e) {
     e.preventDefault();
     searchPage = validSearchPage(searchPage + 1);
-    searchIt(lastSearch);
+    searchIt(lastSearch, false);
   });
 
-  function updateSort() {
+  $('#pagerPage').submit(function(e) {
+    e.preventDefault();
+    searchPage = validSearchPage($(this).find('input').val() - 1);
+    searchIt(lastSearch, false);
+  });
+
+  function updatedSort() {
     lastSearch.params.by = sortBy;
     lastSearch.params.desc = desc;
     return lastSearch;
@@ -237,6 +263,7 @@ function searching() {
 
   $('#byName').click(function(e) {
     e.preventDefault();
+
     if (sortBy === 'name') {
       desc = (desc + 1) % 2;
     } else {
@@ -246,11 +273,12 @@ function searching() {
     }
     $(this).html('Sort by Name ' + ((desc === 0) ? '&#8593;' : '&#8595;')).addClass('active');
     $('#byDate').html('Sort by Date').removeClass('active');
-    searchIt(updateSort());
+    searchIt(updatedSort(), true);
   });
 
   $('#byDate').click(function(e) {
     e.preventDefault();
+
     if (sortBy === 'timeRegistered') {
       desc = (desc + 1) % 2;
     } else {
@@ -260,7 +288,7 @@ function searching() {
     }
     $(this).html('Sort by Date ' + ((desc === 0) ? '&#8593;' : '&#8595;')).addClass('active');
     $('#byName').html('Sort by Name').removeClass('active');
-    searchIt(updateSort());
+    searchIt(updatedSort(), true);
   });
 
   $('#listAllModules').click(function(e) {
@@ -272,7 +300,7 @@ function searching() {
         'by' : sortBy,
         'desc' : desc
       }
-    });
+    }, true);
   });
 
   $('#listUnapprovedModules').click(function(e) {
@@ -359,7 +387,7 @@ function fillWithLatestAdditions() {
       'by' : 'timeRegistered',
       'desc' : 1
     }
-  });
+  }, true);
 }
 
 function initSearchResultProcessor() {
@@ -367,6 +395,7 @@ function initSearchResultProcessor() {
     var searchedForText = $('#searchedForText');
     var error = $('#searchResults').find('.error');
     var noResults = $('#searchResults').find('.noResults');
+    var placeHolder = $('#searchResults').find('.placeholder');
     var results = $('#results');
     var resultsUl = $('#results ul');
     var resultControls = $('#resultControls');
@@ -375,6 +404,8 @@ function initSearchResultProcessor() {
 
     return function(title) {
       return function(data) {
+        $('#searchedForText').removeClass('loading');
+        placeHolder.hide();
         noResults.hide();
         error.hide();
         results.hide();
@@ -452,7 +483,7 @@ function initSearchResultProcessor() {
               tmpl.find('.registered').text(formatTime(module.timeRegistered));
               tmpl.click(function(e) {
                 e.preventDefault();
-                $('#extraInfo-' + module._id).toggle();
+                $('#extraInfo-' + module._id).slideToggle();
               });
 
               addPart('Name', module.name);
@@ -464,10 +495,10 @@ function initSearchResultProcessor() {
                 addPart('Homepage', module.homepage);
               }
               if (module.developers) {
-                addPart('Developers', module.developers.join(', '));
+                addPart('Developers', module.developers.sort().join(', '));
               }
               if (module.keywords) {
-                addPart('Keywords', module.keywords.join(', '));
+                addPart('Keywords', module.keywords.sort().join(', '));
               }
 
               resultsUl.append(tmpl);
@@ -484,7 +515,26 @@ function initSearchResultProcessor() {
   }());
 }
 
-$(function() {
+function randomizeFooter() {
+  var a = [ 'attractive', 'awesome', 'beautiful', 'charismatic', 'colorful', 'cool', 'fabulous',
+      'fantastic', 'fine', 'handsome', 'hip', 'funky', 'marvelous', 'nervous', 'nice', 'popular',
+      'strong', 'wonderful' ];
+  var b = [ 'boys', 'chaps', 'dudes', 'fellows', 'gentlemen', 'gorillas', 'guys', 'hipsters',
+      'men', 'pals', 'people', 'rockers', 'strangers' ];
+  function randomize(jqElem) {
+    var result = a[Math.floor(Math.random() * a.length)] + ' '
+        + b[Math.floor(Math.random() * b.length)];
+    jqElem.text(result);
+  }
+
+  $('#footer .randomName').click(function(e) {
+    e.preventDefault();
+    randomize($(this));
+  });
+  $('#footer .randomName').click();
+}
+
+function init() {
   processSearchResults = initSearchResultProcessor();
   countModules();
   authentication();
@@ -492,4 +542,7 @@ $(function() {
   registering();
   fillWithLatestAdditions();
   dialogs();
-});
+  randomizeFooter();
+}
+
+$(init);
