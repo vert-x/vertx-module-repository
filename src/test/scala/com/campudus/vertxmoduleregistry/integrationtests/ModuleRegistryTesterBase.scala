@@ -22,6 +22,8 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
   val TEMP_DIR = System.getProperty("java.io.tmpdir")
 
   val validModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta2"
+  val validModName2: String = "io.vertx~mod-auth-mgr~2.0.0-beta2"
+  val validModName3: String = "io.vertx~mod-mailer~2.0.0-beta2"
   val invalidModName: String = "mod-mongo-persistor~2.0.0-beta2"
   val snapshotModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta3-SNAPSHOT"
 
@@ -111,11 +113,14 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
     }
   }
 
-  protected def registerModule(modName: String): Future[JsonObject] = {
+  protected def registerModule(modName: String, modLocation: Option[String] = None, modURL: Option[String] = None): Future[JsonObject] = {
     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
     noExceptionInClient(client)
 
-    postJson(client, "/register", "modName" -> modName)
+    val params = List(Some("modName" -> modName),
+      modLocation.map("modLocation" -> _),
+      modURL.map("modURL" -> _))
+    postJson(client, "/register", params.flatten: _*)
   }
 
   protected def noExceptionInClient(client: HttpClient) = client.exceptionHandler({ ex: Throwable =>
@@ -124,6 +129,7 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
 
   protected def postJson(client: HttpClient, url: String, params: (String, String)*): Future[JsonObject] = {
     val p = Promise[JsonObject]
+    println("params: " + params)
     val request = client.post(url, { resp: HttpClientResponse =>
       resp.bodyHandler({ buf: Buffer =>
         try {

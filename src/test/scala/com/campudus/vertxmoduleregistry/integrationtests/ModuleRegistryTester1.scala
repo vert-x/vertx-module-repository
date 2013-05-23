@@ -38,6 +38,26 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
     }
   }
 
+//  @Test
+//  def testBintrayRegister() {
+//    registerModule(validModName, Some("bintray")) onComplete handleFailure { data =>
+//      Option(data.getString("status")) match {
+//        case Some("ok") => testComplete()
+//        case _ => fail("wrong status / error reply: " + data.encode())
+//      }
+//    }
+//  }
+
+  @Test
+  def testCustomMavenRegister() {
+    registerModule(validModName, Some("mavenCustom"), Some("http://repo1.maven.org/maven2/")) onComplete handleFailure { data =>
+      Option(data.getString("status")) match {
+        case Some("ok") => testComplete()
+        case _ => fail("wrong status / error reply: " + data.encode())
+      }
+    }
+  }
+
   @Test
   def testRegisterModTwice() {
     registerModule(validModName) flatMap (_ => registerModule(validModName)) onComplete handleFailure { data =>

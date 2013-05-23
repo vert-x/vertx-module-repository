@@ -413,10 +413,6 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
 
     (group, artifactId, version)
   }
-  private def createUriFromUrl(modURL: Option[String]) = modURL match {
-    case Some(url) => new URI(url)
-    case None => throw new ModuleRegistryException("No download URL given - don't know how to check mod.json");
-  }
 
   private def createMavenCentralUri(group: String, artifact: String, version: String) =
     createMavenUri("http://repo1.maven.org/maven2/", group, artifact, version)
@@ -453,8 +449,8 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
         case None => throw new ModuleRegistryException("Prefix for custom maven repository missing!")
       }
       case Some("bintray") => createBintrayUri(group, artifact, version)
-      case Some(_) => createUriFromUrl(modURL)
-      case None => createUriFromUrl(modURL)
+      case None => createMavenCentralUri(group, artifact, version)
+      case _ => throw new ModuleRegistryException("No valid location given. Aborting.")
     }
 
     val tempUUID = java.util.UUID.randomUUID()
