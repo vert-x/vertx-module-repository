@@ -153,6 +153,10 @@ input[type="text"],input[type="url"],input[type="number"] {
 	float: right;
 }
 
+#slideItLabel {
+	margin-right: 10px;
+}
+
 #searchedForText {
 	display: block;
 	padding: 5px;
@@ -160,8 +164,9 @@ input[type="text"],input[type="url"],input[type="number"] {
 }
 
 #searchedForText.loading {
+	padding-left: 30px;
 	background-image: url("../images/loading.gif");
-	background-position: center;
+	background-position: left;
 	background-repeat: no-repeat;
 }
 

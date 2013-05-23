@@ -1,7 +1,6 @@
-var entriesPerPage, errorDialog, lastSearch, moduleCount, processSearchResults, searchMaxModules, searchPage, sessionID;
+var entriesPerPage, errorDialog, lastSearch, moduleCount, processSearchResults, searchMaxModules, searchPage = 0, sessionID;
 
 entriesPerPage = 4;
-searchPage = 0;
 
 function showDialog(dialog, text, refreshSearch) {
   var jqDialog = $('#' + dialog + 'Dialog');
@@ -72,6 +71,9 @@ function formatTime(time) {
 
 function searchIt(query, searchUpdated) {
   $('#searchedForText').addClass('loading');
+  if ($('#slideIt').is(':checked')) {
+    $('#searchResults').slideUp();
+  }
   lastSearch = query;
   lastSearch.params.limit = entriesPerPage;
   lastSearch.params.skip = searchPage * entriesPerPage;
@@ -140,43 +142,6 @@ function authentication() {
   var loginErrors;
   loginErrors = $('#loginDialog .text');
 
-  function setLoggedIn(isAuthenticated) {
-    var authed, unauthed, i, rule, rules, sIdx, ss;
-    for (sIdx = document.styleSheets.length - 1; sIdx >= 0; sIdx--) {
-      ss = document.styleSheets[sIdx];
-      rules = ss.cssRules || ss.rules;
-
-      for (i = rules.length - 1; i >= 0; i--) {
-        rule = rules[i];
-        if (/(^|,) *.authed *(,|$)/i.test(rule.selectorText)) {
-          authed = rule;
-        }
-        if (/(^|,) *.unauthed *(,|$)/i.test(rule.selectorText)) {
-          unauthed = rule;
-        }
-
-        if (authed && unauthed) {
-          break;
-        }
-      }
-
-      if (authed && unauthed) {
-        break;
-      } else {
-        authed = false;
-        unauthed = false;
-      }
-    }
-
-    if (authed && unauthed && !!isAuthenticated) {
-      authed.style.display = '';
-      unauthed.style.display = 'none';
-    } else if (authed && unauthed && !isAuthenticated) {
-      authed.style.display = 'none';
-      unauthed.style.display = '';
-    }
-  }
-
   $('#loginBtn').click(function() {
     showDialog('login');
   });
@@ -190,8 +155,12 @@ function authentication() {
       if (data.status === 'ok') {
         sessionID = data.sessionID;
 
-        setLoggedIn(true);
+        $('.authed').show();
+        $('.unauthed').hide();
 
+        $('#listUnapprovedModules').click();
+
+        $('#loginFormPassword').val('');
         dismissDialog('login');
       } else if (data.status === 'error') {
         loginErrors.text(data.messages.join(', '));
@@ -208,11 +177,13 @@ function authentication() {
     $.post('/logout', {
       'sessionID' : sessionID
     }, function(data) {
+      delete sessionID;
       if (data.status === 'ok') {
-        setLoggedIn(false);
+        $('.authed').hide();
+        $('.unauthed').show();
 
+        $('#listAllModules').click();
         showDialog('info', 'Successfully logged out.', true);
-      } else {
       }
     }, 'json');
   });
@@ -305,9 +276,14 @@ function searching() {
 
   $('#listUnapprovedModules').click(function(e) {
     e.preventDefault();
-    $.post('/unapproved', {
-      'sessionID' : sessionID
-    }, processSearchResults('All unapproved modules'), 'json');
+    searchIt({
+      'url' : '/unapproved',
+      'title' : 'All unapproved modules',
+      'method' : 'post',
+      'params' : {
+        'sessionID' : sessionID
+      }
+    });
   });
 }
 
@@ -342,6 +318,7 @@ function registering() {
               text += '<p>Could not notify moderators, please notify them through IRC'
                   + ' or via the mailing list to get your module approved quickly.</p>';
             }
+            $('#registerForm input').val("");
             showDialog('info', text, true);
           } else if (reply.status === 'error') {
             if (reply.message) {
@@ -411,6 +388,11 @@ function initSearchResultProcessor() {
         results.hide();
         resultControls.hide();
         pagerControls.hide();
+        if ($('#slideIt').is(':checked')) {
+          $('#searchResults').slideDown();
+        } else {
+          $('#searchResults').show();
+        }
 
         if (data.status === 'error') {
           error.text(data.messages.join(', '));
@@ -432,6 +414,9 @@ function initSearchResultProcessor() {
               var extraInfos = tmpl.find('.extraInfos');
               extraInfos.attr('id', 'extraInfo-' + module._id);
               var controls = extraInfos.find('.extraInfoControls');
+              if (isAuthed()) {
+                controls.show();
+              }
               if (!module.approved) {
                 approveLink = $('<a class="approveLink" />');
                 approveImage = $('<img src="images/approve.png" />');
