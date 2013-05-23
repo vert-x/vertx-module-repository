@@ -1,0 +1,274 @@
+/* Dialog */
+.dialog {
+	background: #333;
+	border: 1px solid #fff;
+	color: #fff;
+	display: none;
+	padding: 10px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	margin-left: -200px;
+	z-index: 99999;
+	margin-left: -200px;
+	border-radius: 15px;
+}
+
+.dialog .text {
+	display: block;
+	line-height: 18px;
+	margin-top: 15px;
+	text-align: center;
+}
+
+.dialog .close {
+	float: right;
+	cursor: pointer;
+	margin: -15px -15px 0 0;
+}
+
+#errorDialog {
+	background-color: #faa;
+	border-color: #f33;
+	border-radius: 15px;
+	color: #000;
+}
+
+#mask {
+	display: none;
+	background: #000;
+	height: 100%;
+	left: 0;
+	opacity: 0.75;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 999;
+}
+
+#loginDialog button {
+	width: 100%;
+}
+
+/* Regular styling */
+body {
+	margin: 0 5%;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+	background-color: #006DB4;
+	border-color: #FFF;
+	border-radius: 3px 3px 3px 3px;
+	border-width: 0px;
+	color: #FFF;
+	font-weight: bold;
+	padding: 5px 10px;
+}
+
+button:disabled {
+	background-color: #006DB4;
+	color: #000;
+}
+
+input[type="text"] {
+	border: 1px solid #000;
+	padding: 4px;
+}
+
+a {
+	color: #006DB4;
+	text-decoration: none;
+}
+
+#header {
+	position: relative;
+}
+
+#authContainer {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#search {
+	position: relative;
+	border-bottom: 1px solid #ccc;
+}
+
+#searchControls {
+	float: right;
+}
+
+#searchedForText {
+	padding: 5px;
+	border-bottom: 1px solid #ccc;
+}
+
+#resultControls {
+	float: right;
+	margin-right: 15px;
+}
+
+#pagerControls {
+	margin: 15px 15px 15px 0;
+}
+
+#results ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+#results>ul {
+	border-bottom: 1px solid #aaa;
+}
+
+#results>ul>li {
+	cursor: pointer;
+	padding: 5px;
+	border-top: 1px solid #aaa;
+	padding: 5px;
+}
+
+#results>ul>li .name {
+	float: left;
+}
+
+#results>ul>li .registered {
+	float: right;
+}
+
+#results>ul>li .generalInfos:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+#results .extraInfoControls {
+	text-align: right;
+}
+
+#results .extraInfos {
+	background-color: #fff;
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid #aaa;
+	border-radius: 5px;
+}
+
+#results .extraInfos .key {
+	float: left;
+}
+
+#results .extraInfos .value {
+	float: right;
+}
+
+#results .extraInfos .infoPart {
+	border-radius: 0;
+	border-bottom: 1px dotted #aaa;
+}
+
+#results .extraInfos .infoPart:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+#results>ul>li:nth-child(odd) {
+	background-color: #eee;
+}
+
+#results>ul>li:nth-child(even) {
+	background-color: #ddd;
+}
+
+#registerForm input[type="text"],#registerForm input[type="url"] {
+	display: block;
+	width: 95%;
+	left: 0;
+	right: 0;
+}
+
+#registerForm ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+#registerForm button {
+	width: 33%;
+}
+
+#footer {
+	font-size: 10px;
+}
+
+#footer ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+#footer ul li {
+	float: left;
+	margin: 15px;
+}
+
+#footer ul:after {
+	content: ".";
+	display: block;
+	height: 15px;
+	clear: both;
+	visibility: hidden;
+}
+
+div .help {
+	display: inline;
+}
+
+div .help .controls {
+	display: inline;
+}
+
+div .help .text {
+	margin: 10px;
+	padding: 5px;
+	border: 1px solid #bbb;
+	background-color: #ddd;
+	border-radius: 5px;
+	padding: 5px;
+}
+
+.col {
+	display: inline-block;
+	vertical-align: top;
+	width: 33%;
+}
+
+.columns:after {
+	content: ".";
+	display: block;
+	height: 15px;
+	clear: both;
+	visibility: hidden;
+}
+
+/* Hide stuff */
+.dialog,.template,.authed,.error,.extraInfos,.help .text {
+	display: none;
+}
+
+#resultControls,#registrationFormContainer {
+	display: none;
+}
+
+.unauthed {
+	display: inherit;
+}

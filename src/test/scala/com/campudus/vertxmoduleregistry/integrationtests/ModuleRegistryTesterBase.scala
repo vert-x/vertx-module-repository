@@ -31,8 +31,8 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
   override def start(startedResult: org.vertx.java.core.Future[Void]) {
     // clean up temp files and directory
     val dirContent = readDir(TEMP_DIR)
-    dirContent.map( array => array.filter(isModule).foreach(new File(_).delete()))
-    dirContent.map( array => array.filter(isTemporaryDir).foreach(new File(_).delete()))
+    dirContent.map(array => array.filter(isModule).foreach(new File(_).delete()))
+    dirContent.map(array => array.filter(isTemporaryDir).foreach(new File(_).delete()))
 
     container.deployModule(System.getProperty("vertx.modulename"),
       createJson(),
@@ -53,7 +53,7 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
       })
   }
 
-  def createJson() : JsonObject
+  def createJson(): JsonObject
 
   protected def handleFailure[T](doSth: T => Unit): Function1[Try[T], Any] = {
     case Success(x) => doSth(x)
@@ -94,6 +94,13 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
     }
   }
 
+  protected def countModules() = {
+    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+    noExceptionInClient(client)
+
+    getJson(client, "/count")
+  }
+
   protected def deleteModule(modName: String) = {
     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
     noExceptionInClient(client)
@@ -104,7 +111,7 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
     }
   }
 
- protected def registerModule(modName: String): Future[JsonObject] = {
+  protected def registerModule(modName: String): Future[JsonObject] = {
     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
     noExceptionInClient(client)
 

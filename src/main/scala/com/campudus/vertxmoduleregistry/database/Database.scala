@@ -96,11 +96,11 @@ Thanks!"""
       val description = obj.getString("description")
       val licenses = jsonArrayToStringList(obj.getArray("licenses"))
       val author = obj.getString("author")
-      val keywords =  Option(obj.getArray("keywords")) map jsonArrayToStringList
-      val developers =  Option(obj.getArray("developers")) map jsonArrayToStringList
+      val keywords = Option(obj.getArray("keywords")) map jsonArrayToStringList
+      val developers = Option(obj.getArray("developers")) map jsonArrayToStringList
       val homepage = Option(obj.getString("homepage"))
 
-      Module(downloadUrl, name, description, licenses, author, keywords, homepage, developers,  System.currentTimeMillis())
+      Module(downloadUrl, name, description, licenses, author, keywords, homepage, developers, System.currentTimeMillis())
     }
 
     def fromMongoJson(obj: JsonObject): Module = {
@@ -110,8 +110,8 @@ Thanks!"""
       val licenses = jsonArrayToStringList(obj.getArray("licenses"))
       val author = obj.getString("author")
 
-      val keywords =  Option(obj.getArray("keywords")) map jsonArrayToStringList
-      val developers =  Option(obj.getArray("developers")) map jsonArrayToStringList
+      val keywords = Option(obj.getArray("keywords")) map jsonArrayToStringList
+      val developers = Option(obj.getArray("developers")) map jsonArrayToStringList
       val homepage = Option(obj.getString("homepage"))
 
       val timeRegistered = obj.getLong("timeRegistered")
@@ -123,67 +123,69 @@ Thanks!"""
     }
   }
 
-  def searchModules(vertx: Vertx, search: String): Future[List[Module]] = {
-    val searchRegexObj = json.putString("$regex", search)
-    val listOfFields = List("downloadUrl", "name", "description", "licenses", "author", "keywords", "homepage", "developers")
-    val arr = new JsonArray
-    listOfFields map (json.putObject(_, searchRegexObj)) foreach (arr.addObject)
+  def searchModules(vertx: Vertx, search: Option[String], by: Option[String], limit: Option[Int], skip: Option[Int], desc: Boolean = false, approved: Boolean = true): Future[List[Module]] = {
+    val searchJson = search match {
+      case Some(s) =>
+        val searchRegexObj = json.putString("$regex", s)
+        val listOfFields = List("downloadUrl", "name", "description", "licenses", "author", "keywords", "homepage", "developers")
+        val arr = new JsonArray
+        listOfFields map (json.putObject(_, searchRegexObj)) foreach (arr.addObject)
 
-    val searchJson = json
-      .putArray("$or", arr)
-      .putBoolean("approved", true)
+        json.putArray("$or", arr)
+      case None => json
+    }
 
-    println("Searching for with: " + searchJson.encode())
+    val findAction = json
+      .putString("action", "find")
+      .putString("collection", "modules")
+      .putObject("matcher", searchJson.putBoolean("approved", approved))
+
+    by map (key => findAction.putObject("sort", json.putNumber(key, if (desc) -1 else 1)))
+    limit map (findAction.putNumber("limit", _))
+    skip map (findAction.putNumber("skip", _))
+
+    println("Searching for with: " + findAction.encode())
 
     val p = Promise[List[Module]]
 
-    vertx.eventBus().send(dbAddress,
-      json
-        .putString("action", "find")
-        .putString("collection", "modules")
-        .putObject("matcher", searchJson), {
-        msg: Message[JsonObject] =>
-          msg.body.getString("status") match {
-            case "ok" =>
-              import scala.collection.JavaConversions._
-              val modules = msg.body.getArray("results").map {
-                case m: JsonObject => Module.fromMongoJson(m)
-              }
-              p.success(modules.toList)
-
-            case "error" => p.failure(new DatabaseException(msg.body.getString("message")))
+    vertx.eventBus().send(dbAddress, findAction, { msg: Message[JsonObject] =>
+      msg.body.getString("status") match {
+        case "ok" =>
+          import scala.collection.JavaConversions._
+          val modules = msg.body.getArray("results").map {
+            case m: JsonObject => Module.fromMongoJson(m)
           }
-      })
+          p.success(modules.toList)
+
+        case "error" => p.failure(new DatabaseException(msg.body.getString("message")))
+      }
+    })
 
     p.future
   }
 
-  def listModules(vertx: Vertx, limit: Option[Int], skip: Option[Int]): Future[List[Module]] = {
-    val p = Promise[List[Module]]
+  def countModules(vertx: Vertx): Future[Int] = {
+    val p = Promise[Int]
     val params = json
-      .putString("action", "find")
+      .putString("action", "count")
       .putString("collection", "modules")
-      .putObject("sort", json.putNumber("name", 1))
-      .putObject("matcher", json.putBoolean("approved", true))
 
-    limit map (params.putNumber("limit", _))
-    skip map (params.putNumber("skip", _))
+    vertx.eventBus().send(dbAddress, params, { msg: Message[JsonObject] =>
+      msg.body.getString("status") match {
+        case "ok" =>
+          import scala.collection.JavaConversions._
+          val count = msg.body.getInteger("count")
+          p.success(count)
 
-    vertx.eventBus().send(dbAddress, params, {
-      msg: Message[JsonObject] =>
-        msg.body.getString("status") match {
-          case "ok" =>
-            import scala.collection.JavaConversions._
-            val modules = msg.body.getArray("results").map {
-              case m: JsonObject => Module.fromMongoJson(m)
-            }
-            p.success(modules.toList)
-
-          case "error" => p.failure(new DatabaseException(msg.body.getString("message")))
-        }
+        case "error" => p.failure(new DatabaseException(msg.body.getString("message")))
+      }
     })
 
     p.future
+  }
+
+  def listModules(vertx: Vertx, by: Option[String], limit: Option[Int], skip: Option[Int], desc: Boolean = false, approved: Boolean = true): Future[List[Module]] = {
+    searchModules(vertx, None, by, limit, skip, desc, approved)
   }
 
   def latestApprovedModules(vertx: Vertx, limit: Int): Future[List[Module]] = {
@@ -212,27 +214,7 @@ Thanks!"""
   }
 
   def unapproved(vertx: Vertx): Future[List[Module]] = {
-    val p = Promise[List[Module]]
-    vertx.eventBus().send(dbAddress,
-      json
-        .putString("action", "find")
-        .putString("collection", "modules")
-        .putObject("sort", json.putNumber("timeRegistered", 1))
-        .putObject("matcher", json.putBoolean("approved", false)), {
-        msg: Message[JsonObject] =>
-          msg.body.getString("status") match {
-            case "ok" =>
-              import scala.collection.JavaConversions._
-              val modules = msg.body.getArray("results").map {
-                case m: JsonObject => Module.fromMongoJson(m)
-              }
-              p.success(modules.toList)
-
-            case "error" => p.failure(new DatabaseException(msg.body.getString("message")))
-          }
-      })
-
-    p.future
+    searchModules(vertx, None, Some("timeRegistered"), None, None, false, false)
   }
 
   def remove(vertx: Vertx, id: String): Future[JsonObject] = {
@@ -253,7 +235,7 @@ Thanks!"""
                 json
                   .putString("action", "delete")
                   .putString("collection", "modules")
-                  .putObject("matcher", json.putString("name", id)), {
+                  .putObject("matcher", json.putString("_id", id)), {
                   msg: Message[JsonObject] =>
                     msg.body.getString("status") match {
                       case "ok" => p.success(json.putString("status", "ok").putString("_id", id))

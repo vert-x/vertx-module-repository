@@ -12,7 +12,7 @@ import org.vertx.java.core.http.{ HttpServerRequest, RouteMatcher }
 import org.vertx.java.core.json.{ JsonArray, JsonObject }
 import com.campudus.vertx.Verticle
 import com.campudus.vertx.helpers.{ PostRequestReader, VertxFutureHelpers, VertxScalaHelpers }
-import com.campudus.vertxmoduleregistry.database.Database.{ Module, approve, latestApprovedModules, listModules, registerModule, remove, searchModules, unapproved }
+import com.campudus.vertxmoduleregistry.database.Database.{ Module, approve, countModules, latestApprovedModules, listModules, registerModule, remove, searchModules, unapproved }
 import com.campudus.vertxmoduleregistry.security.Authentication.{ authorise, login, logout }
 import java.nio.file.Files
 import org.vertx.java.core.file.FileSystemException
@@ -92,24 +92,43 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
         }
     })
 
-    rm.get("/list", {
-      implicit req: HttpServerRequest =>
-        val limit = Option(req.params().get("limit")) flatMap toInt
-        val skip = Option(req.params().get("skip")) flatMap toInt
-
-        listModules(vertx, limit, skip) onComplete {
-          case Success(modules) =>
-            println("got some modules: " + modules)
-            val modulesArray = new JsonArray()
-            modules.map(_.toJson).foreach(m => modulesArray.addObject(m))
-            req.response.end(json.putArray("modules", modulesArray).encode)
-          case Failure(error) => respondFailed(error.getMessage())
-        }
+    rm.get("/count", { implicit req: HttpServerRequest =>
+      countModules(vertx) onComplete {
+        case Success(count) =>
+          req.response.end(json.putString("status", "ok").putNumber("count", count).encode)
+        case Failure(error) => respondFailed(error.getMessage())
+      }
     })
 
-    rm.get("/unapproved", { implicit req: HttpServerRequest =>
-      req.params().get("sessionID") match {
-        case s: String => {
+    rm.get("/list", { implicit req: HttpServerRequest =>
+      val by = Option(req.params().get("by"))
+      val desc = Option(req.params().get("desc")) match {
+        case Some("1") => true
+        case _ => false
+      }
+      val limit = Option(req.params().get("limit")) flatMap toInt
+      val skip = Option(req.params().get("skip")) flatMap toInt
+
+      listModules(vertx, by, limit, skip, desc) onComplete {
+        case Success(modules) =>
+          println("got some modules: " + modules)
+          val modulesArray = new JsonArray()
+          modules.map(_.toJson).foreach(m => modulesArray.addObject(m))
+          req.response.end(json.putArray("modules", modulesArray).encode)
+        case Failure(error) => respondFailed(error.getMessage())
+      }
+    })
+
+    rm.post("/unapproved", { implicit req: HttpServerRequest =>
+      req.bodyHandler({ buf: Buffer =>
+        implicit val paramMap = PostRequestReader.dataToMap(buf.toString)
+        implicit val errorBuffer = collection.mutable.ListBuffer[String]()
+
+        val sessionID = getRequiredParam("sessionID", "Session ID required")
+
+        val errors = errorBuffer.result
+        if (errors.isEmpty) {
+
           def callUnapproved() = {
             unapproved(vertx) onComplete {
               case Success(modules) =>
@@ -120,14 +139,14 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
             }
           }
 
-          isAuthorised(vertx, s) map {
+          isAuthorised(vertx, sessionID) map {
             case true => callUnapproved
             case false => respondDenied
           }
+        } else {
+          respondErrors(errors)
         }
-        case _ => respondDenied
-      }
-
+      })
     })
 
     rm.post("/login", { implicit req: HttpServerRequest =>
@@ -211,10 +230,17 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
         implicit val errorBuffer = collection.mutable.ListBuffer[String]()
 
         val query = getRequiredParam("query", "Cannot search with empty keywords")
+        val by = Option(req.params().get("by"))
+        val desc = Option(req.params().get("desc")) match {
+          case Some("1") => true
+          case _ => false
+        }
+        val limit = Option(req.params().get("limit")) flatMap toInt
+        val skip = Option(req.params().get("skip")) flatMap toInt
 
         val errors = errorBuffer.result
         if (errors.isEmpty) {
-          searchModules(vertx, query) onComplete {
+          searchModules(vertx, Some(query), by, limit, skip, desc) onComplete {
             case Success(modules) =>
               val modulesArray = new JsonArray()
               modules.map(_.toJson).foreach(m => modulesArray.addObject(m))
@@ -258,7 +284,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
             }
           } catch {
             case e: Exception =>
-              respondFailed("Module name could not be parsed" + e.getMessage())
+              respondFailed("Module name could not be parsed: " + e.getMessage())
           }
         } else {
           respondErrors(errors)
@@ -352,24 +378,6 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     logger.info("started module registry server")
   }
 
-  private def createMavenUri(modName: String) = {
-    val uri = new StringBuilder("http://repo1.maven.org/maven2/")
-    val parts = modName.split('~')
-    if (parts.length != 3) {
-      throw new ModuleRegistryException("Must be in same format as 'io.vertx~mod-mongo-persistor~1.0'")
-    }
-    val group = parts(0)
-    val artifactId = parts(1)
-    val version = parts(2)
-    if (version.toLowerCase().endsWith("snapshot")) {
-      throw new ModuleRegistryException("No SNAPSHOTS are allowed for registration")
-    }
-    group.split("\\.").foreach(uri.append(_).append('/'))
-    uri.append(artifactId).append('/').append(version).append('/')
-    uri.append(artifactId).append('-').append(version).append(".zip")
-    new URI(uri.toString())
-  }
-
   override def stop() {
     logger.info("stopped module registry server")
   }
@@ -394,8 +402,60 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     }
   }
 
+  private def splitModule(modName: String) = {
+    val parts = modName.split('~')
+    if (parts.length != 3) {
+      throw new ModuleRegistryException("Must be in same format as 'io.vertx~mod-mongo-persistor~1.0'")
+    }
+    val group = parts(0)
+    val artifactId = parts(1)
+    val version = parts(2)
+
+    (group, artifactId, version)
+  }
+  private def createUriFromUrl(modURL: Option[String]) = modURL match {
+    case Some(url) => new URI(url)
+    case None => throw new ModuleRegistryException("No download URL given - don't know how to check mod.json");
+  }
+
+  private def createMavenCentralUri(group: String, artifact: String, version: String) =
+    createMavenUri("http://repo1.maven.org/maven2/", group, artifact, version)
+
+  private def createMavenUri(prefix: String, group: String, artifact: String, version: String) = {
+    val uri = new StringBuilder(prefix)
+    group.split("\\.").foreach(uri.append(_).append('/'))
+    uri.append(artifact).append('/').append(version).append('/')
+    uri.append(artifact).append('-').append(version).append(".zip")
+    new URI(uri.toString())
+  }
+
+  private def createBintrayUri(group: String, artifact: String, version: String) = {
+    val repo = "vertx-mods"
+
+    val sb = new StringBuilder("http://dl.bintray.com/content")
+    sb.append('/').append(group).append('/').append(repo).append('/').append(artifact).append('/')
+      .append(artifact).append('-').append(version).append(".zip")
+
+    new URI(sb.toString())
+  }
+
   private def downloadExtractAndRead(modName: String, modLocation: Option[String], modURL: Option[String]): Future[Module] = {
-    val uri = createMavenUri(modName)
+    val (group, artifact, version) = splitModule(modName)
+
+    if (version.toLowerCase().endsWith("snapshot")) {
+      throw new ModuleRegistryException("No SNAPSHOTS are allowed for registration")
+    }
+
+    val uri = modLocation match {
+      case Some("mavenCentral") => createMavenCentralUri(group, artifact, version)
+      case Some("mavenCustom") => modURL match {
+        case Some(prefix) => createMavenUri(prefix, group, artifact, version)
+        case None => throw new ModuleRegistryException("Prefix for custom maven repository missing!")
+      }
+      case Some("bintray") => createBintrayUri(group, artifact, version)
+      case Some(_) => createUriFromUrl(modURL)
+      case None => createUriFromUrl(modURL)
+    }
 
     val tempUUID = java.util.UUID.randomUUID()
     val absPath = File.createTempFile("module-", tempUUID + ".tmp.zip").getAbsolutePath()

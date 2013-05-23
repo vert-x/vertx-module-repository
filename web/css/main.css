@@ -1,4 +1,4 @@
-Styleneat  - CSS Organizer . Return Download style.css  | Copy style.css *
+Styleneat     - CSS Organizer    . Return Download style.css     | Copy style.css *
 	{
 	margin: 0;
 	padding: 0;
@@ -101,7 +101,7 @@ fieldset label {
 fieldset label span {
 	display: block;
 	font-size: 11px;
-	font-weight: bold color:  #999;
+	font-weight: bold color:     #999;
 	margin-bottom: 2px;
 }
 
@@ -296,4 +296,50 @@ p {
 #searchResults ul {
 	list-style-type: none;
 	text-align: left;
+	margin: 0;
+}
+
+.extraInfos {
+	display: none;
+}
+
+.extraInfos:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+ul.extraInfos {
+	padding: 0;
+	margin: 10px 0;
+}
+
+.extraInfos .info {
+	clear: both;
+}
+
+.extraInfos .key {
+	float: left;
+	width: 150px;
+}
+
+.extraInfos .value {
+	float: left;
+}
+
+.extraInfos .value ul {
+	padding: 0;
+}
+
+.extraInfos .value ul li {
+	margin-right: 5px;
+}
+
+.extraInfos .keywords li {
+	margin: 0;
+	padding: 2px;
+	margin-right: 5px;
+	border: 1px #006DB4 solid;
 }

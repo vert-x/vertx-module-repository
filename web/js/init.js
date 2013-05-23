@@ -8,25 +8,105 @@ function fillLatestApprovedMods() {
   });
 }
 
+function isLoggedIn() {
+  return typeof sid !== 'undefined';
+}
+
+function bulletsFromList(list, style) {
+  var ul = $('<ul class="' + style + '" />');
+  $.each(list, function(i) {
+    ul.append('<li>' + list[i] + '</li>');
+  });
+  return ul;
+}
+
+function createModuleDiv(item) {
+  var clicker, div, infos, keywords, licenses, time;
+
+  function bullet(key, value) {
+    var li, spanKey, spanValue;
+    li = $('<li class="info" />');
+    spanKey = $('<span class="key" />').text(key);
+    spanValue = $('<span class="value" />');
+    if (typeof value !== 'undefined') {
+      spanValue.text(value);
+    }
+    li.append(spanKey);
+    li.append(spanValue);
+
+    return {
+      li : li,
+      key : spanKey,
+      value : spanValue
+    };
+  }
+
+  extraInfos = $('<div class="extraInfos" id="extraInfos-' + item._id + '" />');
+  if (isLoggedIn()) {
+    
+  }
+  infos = $('<ul class="infos" />');
+  infos.append(bullet('Name', item.name).li);
+  infos.append(bullet('Description', item.description).li);
+  infos.append(bullet('Author', item.author).li);
+  if (item.downloadUrl != null) {
+    infos.append(bullet('Download-URL', item.downloadUrl).li);
+  }
+  infos.append(bullet('Homepage', item.homepage).li);
+
+  licenses = bullet('Licenses');
+  licenses.value.append(bulletsFromList(item.licenses, 'licenses'));
+  infos.append(licenses.li);
+
+  keywords = bullet('Keywords');
+  keywords.value.append(bulletsFromList(item.keywords, 'keywords'));
+  infos.append(keywords.li);
+
+  extraInfos.append(infos);
+
+  if (item.timeApproved != -1) {
+    time = item.timeApproved;
+  } else {
+    time = item.timeRegistered;
+  }
+
+  div = $('<div class="modname"><span class="date">' + formatTimestamp(time) + '</span></div>');
+  clicker = $('<a href="#">' + item.name + '</a>');
+
+  /*
+   * { "downloadUrl":null, "name":"io.vertx~mod-mongo-persistor~2.0.0-beta2",
+   * "description":"MongoDB persistor module for Vert.x", "licenses":["The
+   * Apache Software License Version 2.0"], "author":"purplefox",
+   * "homepage":"https://github.com/vert-x/mod-mongo-persistor",
+   * "keywords":["mongo","mongodb","database","databases","persistence","json","nosql"],
+   * "_id":"7fc57796-28f9-49b4-b346-d9361501a78f",
+   * "timeRegistered":1369216883259, "timeApproved":-1, "approved":true }
+   */
+
+  clicker.click(extraInfos, function(event) {
+    event.preventDefault();
+    event.data.fadeToggle();
+  });
+
+  div.append(clicker);
+  div.append(extraInfos);
+
+  return div;
+}
+
 function getLiFromMods(modules) {
-  var additional, item, items = '<ul>', time;
+  var div, item, items = $('<ul />'), time;
   while (modules.length) {
     item = modules.pop();
-    if (item.repository) {
-      additional = ' (<a href="' + item.repository + '">Repo</a>)';
-    } else {
-      additional = '';
-    }
-    if (item.timeApproved != -1) {
-      time = item.timeApproved;
-    } else {
-      time = item.timeRegistered;
-    }
-    items += '<li class="mod" id="' + item._id + '"><div class="modname"><span class="date">'
-        + formatTimestamp(time) + '</span> - <a href="' + item.modName + '">' + item.name
-        + '</a>' + additional + '</div></li>';
+
+    itemResult = $('<li class="module" id="searchResult-' + item._id + '" />');
+    div = createModuleDiv(item);
+    console.log(JSON.stringify(item));
+    itemResult.append(div);
+
+    items.append(itemResult);
   }
-  items += '</ul>';
+
   return items;
 }
 
@@ -78,8 +158,7 @@ function createListFormSubmitHandler() {
     event.preventDefault();
     $('#listButton').attr('disabled', true);
     $('#listButton').text('Retrieving List ...');
-    $.get('/list', {
-    }, function(data) {
+    $.get('/list', {}, function(data) {
       $('#listButton').attr('disabled', false);
       $('#listButton').text('List All Modules');
       $('#searchResults').empty();
@@ -148,8 +227,8 @@ function createRegisterFormHandler() {
     $('#registerButton').text('Checking validity of module...');
     $.post('/register', {
       modName : $('#registerFormModName').val(),
-      modLocation: $('#registerFormModLocation').val(),
-      modURL: $('#registerFormModURL').val()
+      modLocation : $('#registerFormModLocation').val(),
+      modURL : $('#registerFormModURL').val()
     }, processRegisterResult, 'json');
   });
 }
@@ -232,7 +311,7 @@ function createUnapprovedModsHandler() {
     $('#loginButton').text('Login');
 
     if (data.status == 'ok' && data.sessionID) {
-      sid = data.sessionID
+      sid = data.sessionID;
       getUnapproved();
     } else if (data.status == 'error') {
       processStatusError(data);
