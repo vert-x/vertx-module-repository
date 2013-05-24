@@ -288,6 +288,7 @@ function searching() {
 }
 
 function registering() {
+  var additionalURL = $('#registerFormAdditionalURL');
   var oldButtonText = $('#registerButton').html();
 
   $('#registrationLink').click(function(e) {
@@ -302,8 +303,8 @@ function registering() {
           'modName' : $('#registerFormName').val(),
           'modLocation' : $('#registerForm input[name="location"]:checked').val()
         };
-        if (!$('#registerFormAdditionalURL').is(':disabled')) {
-          params.modURL = $('#registerFormAdditionalURL').val();
+        if (!additionalURL.is(':disabled')) {
+          params.modURL = additionalURL.val();
         }
         $('#registerButton').attr('disabled', true);
         $('#registerButton').text('Checking validity of module ...');
@@ -332,23 +333,37 @@ function registering() {
 
   function checkAdditionalInfos() {
     var value = $(this).val();
-    $('#registerFormAdditionalURL').attr('disabled', false);
+    var registerAdditionalLabel = $('#registrationFormAdditional .label');
     if (value === 'mavenCentral') {
-      $('#registrationFormAdditional .label').text('No additional information needed');
-      $('#registerFormAdditionalURL').slideUp();
-      $('#registerFormAdditionalURL').attr('disabled', true);
+      registerAdditionalLabel.text('No additional information needed');
+
+      additionalURL.attr('disabled', 'disabled');
+      additionalURL.slideUp();
     } else if (value === 'mavenOther') {
-      $('#registrationFormAdditional .label').text('Maven prefix URL');
-      $('#registerFormAdditionalURL').slideDown();
-      $('#registerFormAdditionalURL').attr('placeholder', 'http://maven.my-company.com/maven2/');
+      registerAdditionalLabel.text('Maven prefix URL');
+
+      additionalURL.slideDown({
+        'complete' : function() {
+          additionalURL.removeAttr('disabled');
+          console.log('disabled? ' + additionalURL.is(':disabled'));
+
+          /* this fixes a chrome bug to refresh the disabled attribute correctly */
+          additionalURL.hide();
+          setTimeout(function() {
+            additionalURL.show()
+          }, 1);
+        }
+      });
     } else if (value === 'bintray') {
-      $('#registrationFormAdditional .label').text('No additional information needed');
-      $('#registerFormAdditionalURL').attr('disabled', true);
-      $('#registerFormAdditionalURL').slideUp();
+      registerAdditionalLabel.text('No additional information needed');
+
+      additionalURL.attr('disabled', 'disabled');
+      additionalURL.slideUp();
     }
   }
-  $('input[name="location"]', '#registerForm').change(checkAdditionalInfos);
-  $('input[name="location"]:checked', '#registerForm').change();
+
+  $('#registerForm input[name="location"]').change(checkAdditionalInfos);
+  $('#registerForm input[name="location"]:checked').change();
 }
 
 function fillWithLatestAdditions() {
