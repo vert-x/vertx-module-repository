@@ -37,7 +37,8 @@ object Database extends VertxScalaHelpers {
   }
 
   case class Module(
-    downloadUrl: String,
+    downloadUrl: Option[String],
+    repoType: String,
     name: String,
     description: String,
     licenses: List[String],
@@ -61,13 +62,14 @@ object Database extends VertxScalaHelpers {
 
     def toSensibleJson(): JsonObject = {
       val js = json
-        .putString("downloadUrl", downloadUrl)
+        .putString("repoType", repoType)
         .putString("name", name)
         .putString("description", description)
         .putArray("licenses", stringListToArray(licenses))
         .putString("author", author)
 
       // Optional fields
+      downloadUrl.map { url => js.putString("downloadUrl", url) }
       developers.map { devs => js.putArray("developers", stringListToArray(devs)) }
       homepage.map { page => js.putString("homepage", page) }
       keywords.map { words => js.putArray("keywords", stringListToArray(words)) }
@@ -99,7 +101,8 @@ Thanks!"""
   object Module {
     def fromModJson(obj: JsonObject): Option[Module] = tryOp {
       val name = obj.getString("name")
-      val downloadUrl = obj.getString("downloadUrl")
+      val downloadUrl = Option(obj.getString("downloadUrl"))
+      val repoType = obj.getString("repoType")
       val description = obj.getString("description")
       val licenses = jsonArrayToStringList(obj.getArray("licenses"))
       val author = obj.getString("author")
@@ -107,12 +110,13 @@ Thanks!"""
       val developers = Option(obj.getArray("developers")) map jsonArrayToStringList
       val homepage = Option(obj.getString("homepage"))
 
-      Module(downloadUrl, name, description, licenses, author, keywords, homepage, developers, System.currentTimeMillis())
+      Module(downloadUrl, repoType, name, description, licenses, author, keywords, homepage, developers, System.currentTimeMillis())
     }
 
     def fromMongoJson(obj: JsonObject): Module = {
       val name = obj.getString("name")
-      val downloadUrl = obj.getString("downloadUrl")
+      val downloadUrl = Option(obj.getString("downloadUrl"))
+      val repoType = obj.getString("repoType")
       val description = obj.getString("description")
       val licenses = jsonArrayToStringList(obj.getArray("licenses"))
       val author = obj.getString("author")
@@ -126,7 +130,7 @@ Thanks!"""
       val approved = obj.getBoolean("approved")
       val id = obj.getString("_id")
 
-      Module(downloadUrl, name, description, licenses, author, keywords, homepage, developers, timeRegistered, timeApproved, approved, id)
+      Module(downloadUrl, repoType, name, description, licenses, author, keywords, homepage, developers, timeRegistered, timeApproved, approved, id)
     }
   }
 
@@ -298,6 +302,7 @@ Thanks!"""
 
   private def saveModule(vertx: Vertx, module: Module): Future[JsonObject] = {
     val p = Promise[JsonObject]
+    println("saving " + module)
     vertx.eventBus().send(dbAddress,
       json
         .putString("action", "save")

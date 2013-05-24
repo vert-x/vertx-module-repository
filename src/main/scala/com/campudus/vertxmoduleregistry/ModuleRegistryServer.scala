@@ -442,14 +442,14 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
       throw new ModuleRegistryException("No SNAPSHOTS are allowed for registration")
     }
 
-    val uri = modLocation match {
-      case Some("mavenCentral") => createMavenCentralUri(group, artifact, version)
+    val (uri, repoType, downloadUrl) = modLocation match {
+      case Some("mavenCentral") => (createMavenCentralUri(group, artifact, version), "mavenCentral", None)
       case Some("mavenOther") => modURL match {
-        case Some(prefix) => createMavenUri(prefix, group, artifact, version)
+        case Some(prefix) => (createMavenUri(prefix, group, artifact, version), "mavenOther", Some(prefix))
         case None => throw new ModuleRegistryException("Prefix for custom maven repository missing!")
       }
-      case Some("bintray") => createBintrayUri(group, artifact, version)
-      case None => createMavenCentralUri(group, artifact, version)
+      case Some("bintray") => (createBintrayUri(group, artifact, version), "bintray", None)
+      case None => (createMavenCentralUri(group, artifact, version), "mavenCentral", None)
       case _ => throw new ModuleRegistryException("No valid location given. Aborting.")
     }
 
@@ -467,7 +467,10 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
       content <- readFileToString(modJson)
     } yield {
       logger.info("got mod.json:\n" + content.toString())
-      val json = new JsonObject(content.toString()).putString("name", modName)
+
+      val json = new JsonObject(content.toString()).putString("name", modName).putString("repoType", repoType)
+      downloadUrl.map(json.putString("downloadUrl", _))
+
       logger.info("in json:\n" + json.encode())
       Module.fromModJson(json.putNumber("timeRegistered", System.currentTimeMillis())) match {
         case Some(module) => module

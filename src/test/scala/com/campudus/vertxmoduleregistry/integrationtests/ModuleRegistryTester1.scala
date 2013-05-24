@@ -32,7 +32,10 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   def testRegisterMod() {
     registerModule(validModName) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
-        case Some("ok") => testComplete()
+        case Some("ok") =>
+          assertNull("Should not get a downloadUrl!", data.getObject("data").getString("downloadUrl"))
+          assertEquals("Should have repoType mavenCentral", "mavenCentral", data.getObject("data").getString("repoType"))
+          testComplete()
         case _ => fail("wrong status / error reply: " + data.encode())
       }
     }
@@ -42,7 +45,10 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   def testBintrayRegister() {
     registerModule(validBintrayModName, Some("bintray")) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
-        case Some("ok") => testComplete()
+        case Some("ok") =>
+          assertNull("Should not get a downloadUrl!", data.getObject("data").getString("downloadUrl"))
+          assertEquals("Should have repoType bintray", "bintray", data.getObject("data").getString("repoType"))
+          testComplete()
         case _ => fail("wrong status / error reply: " + data.encode())
       }
     }
@@ -52,7 +58,10 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   def testCustomMavenRegister() {
     registerModule(validModName, Some("mavenOther"), Some("http://repo1.maven.org/maven2/")) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
-        case Some("ok") => testComplete()
+        case Some("ok") =>
+          assertEquals("Should have repo in downloadUrl", "http://repo1.maven.org/maven2/", data.getObject("data").getString("downloadUrl"))
+          assertEquals("Should have repoType mavenOther", "mavenOther", data.getObject("data").getString("repoType"))
+          testComplete()
         case _ => fail("wrong status / error reply: " + data.encode())
       }
     }
