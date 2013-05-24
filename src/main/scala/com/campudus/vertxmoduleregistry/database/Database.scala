@@ -76,7 +76,7 @@ object Database extends VertxScalaHelpers {
     }
 
     private def formatTime(time: Long): String = {
-      new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z").format(new Date(time))
+      new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss z").format(new Date(time))
     }
 
     def toWaitForApprovalEmailString(): String = {
