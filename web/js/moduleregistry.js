@@ -346,7 +346,7 @@ function registering() {
       $('#registerFormAdditionalURL').attr('disabled', true);
       $('#registerFormAdditionalURL').slideUp();
     } else { // other url
-      $('#registrationFormAdditional .label').text('Download URL for the mod.zip');
+      $('#registrationFormAdditional .label').text('URL for the Maven repository root');
       $('#registerFormAdditionalURL').slideDown();
       $('#registerFormAdditionalURL')
           .attr('placeholder', 'http://www.my-company.com/my-module.zip');
