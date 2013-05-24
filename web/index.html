@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Vert.x Module Registry</title>
+<link rel="stylesheet" type="text/css" href="/css/normalize.css" />
+<link rel="stylesheet" type="text/css" href="/css/main.css" />
+<link rel="stylesheet" type="text/css" href="/css/flick/jquery-ui-1.10.2.custom.css" />
+<script src="js/jquery-1.9.1.js" type="text/javascript"></script>
+<script src="js/jquery-ui-1.10.2.custom.min.js" type="text/javascript"></script>
+<script src="js/init.js" type="text/javascript"></script>
+</head>
+<body id="container">
+	<div id="container">
+		<div id="loginContainer">
+			<a class="close href-less"><img src="images/close.png" /></a>
+			<form id="loginForm" method="post" action="/login">
+				<fieldset>
+					<label> <span>Password</span> <input id="password" type="password"
+						placeholder="Password" value="" name="password">
+					</label>
+					<button id="loginButton" type="submit">Login</button>
+					<span class="errorMessage">error</span>
+				</fieldset>
+			</form>
+		</div>
+		<div id="header">
+			<h1>
+				<span class="head">Vert.x Module Registry</span>
+			</h1>
+		</div>
+		<div id="main">
+			<div class="intro">
+				<p>Welcome to the Vert.x module registry. Here you can list and search for modules that have been submitted by the
+        Vert.x community.</p>
+			</div>
+			<div id="search">
+				<h2>Search</h2>
+				<div id="searchForModules">
+					<form action="/search" method="post" id="searchForm">
+						<fieldset>
+							<legend>Search for modules</legend>
+							<div>
+								<input type="text" name="query" placeholder="Query for modules" id="query" />
+							</div>
+							<button id="searchButton" type="submit">Search</button>
+						</fieldset>
+					</form>
+				</div>
+        <div id="listAllModules">
+          <form action="/list" method="post" id="listForm">
+            <fieldset>
+              <legend>List all modules</legend>
+              <button id="listButton" type="submit">List All Modules</button>
+            </fieldset>
+          </form>
+        </div>
+				<div id="searchResultContainer">
+					<h2>Search results</h2>
+					<div id="searchResults"></div>
+				</div>
+			</div>
+			<div class="col left">
+				<div id="latest" class="topic">
+					<h3>Latest approved modules</h3>
+					<div id="latestApprovedModules"></div>
+				</div>
+				<div id="unapproved" class="topic">
+					<h3>Unapproved modules</h3>
+					<p>
+						<a class="showUnapproved href-less">[Show]</a>
+					</p>
+					<div id="unapprovedModules"></div>
+					<div id="dialogConfirmApprove" title="Approve module?" style="display: none;">
+						<p>Do you really want to approve this module?</p>
+					</div>
+					<div id="dialogConfirmDeny" title="Deny module?" style="display: none;">
+						<p>Do you really want to deny and remove this module?</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="col right">
+				<div class="topic">
+					<h3>You should also visit</h3>
+					<ul>
+						<li><a href="http://vertx.io/"><img src="images/vertx.png" alt="GitHub" /></a></li>
+						<li><a href="http://campudus.com"><img src="images/campudus.png" alt="Campudus" /></a></li>
+					</ul>
+				</div>
+			</div>
+			<div id="register">
+				<h2>Register your own module</h2>
+				<div class="intro">
+					<p>
+						To register your own module, fill out the <a class="showRegister href-less"
+							href="/register">registration form</a>.
+					</p>
+				</div>
+				<div class="error">
+					<h3>Could not register module!</h3>
+					<p class="message">No info from server.</p>
+				</div>
+				<div class="info">
+					<h3>Module has been submitted for moderation!</h3>
+					<p class="message">No info from server.</p>
+				</div>
+				<div id="registerFormContainer">
+					<p>Please provide the identifier of your module so it can be verified..</p>
+          <p>This will look like <pre>com.yourcompany~your-module-name~your-module-version</pre></p>
+          <p>For example <pre>com.yourcompany~foo-mod~1.2</pre></p>
+          <p>Please note that we don't accept SNAPSHOT releases.</p>
+					<form id="registerForm" action="/register" method="POST">
+						<div class="columns">
+							<div class="col left">
+								<fieldset class="reginfo">
+									<legend>Module information</legend>
+									<label for="modName"><span>Module name</span> <input type="text"
+										id="registerFormModName" name="modName" placeholder="Name of the  module"
+										required="required" /> </label>
+
+                  <label for="modLocation"><span>Where is your module?</span>
+                    Maven Central<input type="radio"
+                    id="registerFormModLocation" name="modLocation" value="Maven Central" placeholder="Name of the  module"
+                    required="required" />
+                    Bintray<input type="radio"
+                           id="registerFormModLocation" name="modLocation" value="Bintray" placeholder="Name of the  module"
+                           required="required" />
+                    Other<input type="url" id="registerFormModURL" name="modURL"/>
+                  </label>
+								</fieldset>
+							</div>
+							<div class="col right">
+								<fieldset class="reginfo">
+									<legend>Additional information</legend>
+									...nothing needed yet.
+								</fieldset>
+							</div>
+						</div>
+						<button id="registerButton" type="submit">Verify and submit for moderation</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div id="footer">
+			<p>
+				Made with aid of <span class="randomName">marvelous bananas</span> at <a
+					href="http://campudus.com">Campudus</a>
+			</p>
+		</div>
+	</div>
+</body>
+</html>
