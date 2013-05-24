@@ -359,7 +359,7 @@ function registering() {
 function fillWithLatestAdditions() {
   searchIt({
     'url' : '/list',
-    'title' : 'Latest additions',
+    'title' : 'All modules',
     'params' : {
       'by' : 'timeRegistered',
       'desc' : 1

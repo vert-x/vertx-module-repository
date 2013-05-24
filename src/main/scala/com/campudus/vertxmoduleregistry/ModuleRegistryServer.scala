@@ -471,7 +471,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
       logger.info("in json:\n" + json.encode())
       Module.fromModJson(json.putNumber("timeRegistered", System.currentTimeMillis())) match {
         case Some(module) => module
-        case None => throw new ModuleRegistryException("cannot read module information from mod.json - fields missing?")
+        case None => throw new ModuleRegistryException("The mod.json file of the module does not contain all the mandatory fields required for registration.")
       }
     }
 

@@ -98,10 +98,15 @@
 										<a href="#"><img src="images/help.png" /></a>
 									</div>
 									<div class="text">
-										Please provide the identifier of your module so it can be verified. This will look something like
-										<pre>com.yourcompany~your-module-name~your-module-version</pre>
+										Please provide the identifier of your module so it can be verified. For modules in a Maven repository
+                    this will look like:
+										<pre>groupID~artifactID~version</pre>
 										For example
 										<pre>io.vertx~mod-mongo-persistor~2.0.0-beta2</pre>
+                    For bintray modules it will look something like:
+                    <pre>owner~module-name~version</pre>
+                    For example
+                    <pre>purplefox~my-mod~1.0.0</pre>
                     Your module must already be in a Maven or bintray repository.
 										Please note that we don't accept SNAPSHOT releases.
 									</div>
@@ -119,8 +124,7 @@
 												<a href="#"><img src="images/help.png" /></a>
 											</div>
 											<div class="text">
-												For <a href="http://search.maven.org/">maven central</a>, you don't need any additional
-												information.
+												If your module is in <a href="http://search.maven.org/">Maven Central</a>, select this.
 											</div>
 										</div></li>
 									<li><label><input type="radio" name="location" value="mavenOther"
@@ -130,7 +134,7 @@
 												<a href="#"><img src="images/help.png" /></a>
 											</div>
 											<div class="text">
-												If your module resides in a different Maven repository, you need to provide the prefix URL for it. For example
+												If your module resides in a Maven repository other than Maven Central then select this. You also need to provide the prefix URL for it. For example
 												<pre>https://repository.jboss.org/nexus/content/groups/public-jboss/</pre>
 											</div>
 										</div></li>
@@ -141,8 +145,7 @@
 												<a href="#"><img src="images/help.png" /></a>
 											</div>
 											<div class="text">
-												For <a href="http://www.bintray.com/">bintray</a>, you don't need any additional
-												information.
+												If your module resides in <a href="http://www.bintray.com/">bintray</a>, select this.
 											</div>
 										</div></li>
 								</ul>
