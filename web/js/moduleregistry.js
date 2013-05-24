@@ -541,7 +541,7 @@ function faq() {
     $('#faq').slideUp();
   });
 
-  if (document.location.search.substr(1,document.location.search.length) === 'faq') {
+  if (document.location.search.substr(1, document.location.search.length) === 'faq') {
     $('#faqLink').click();
   }
 }
