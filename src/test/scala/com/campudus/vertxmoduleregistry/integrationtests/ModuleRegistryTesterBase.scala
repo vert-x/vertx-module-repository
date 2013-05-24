@@ -23,7 +23,7 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
 
   val validModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta2"
   val validModName2: String = "io.vertx~mod-auth-mgr~2.0.0-beta2"
-  val validModName3: String = "io.vertx~mod-mailer~2.0.0-beta2"
+  val validBintrayModName: String = "timvolpe~mod-test~1.0.0-beta1"
   val invalidModName: String = "mod-mongo-persistor~2.0.0-beta2"
   val snapshotModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta3-SNAPSHOT"
 

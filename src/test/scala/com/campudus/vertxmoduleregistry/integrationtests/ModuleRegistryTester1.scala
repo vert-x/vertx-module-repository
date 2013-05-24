@@ -38,19 +38,19 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
     }
   }
 
-//  @Test
-//  def testBintrayRegister() {
-//    registerModule(validModName, Some("bintray")) onComplete handleFailure { data =>
-//      Option(data.getString("status")) match {
-//        case Some("ok") => testComplete()
-//        case _ => fail("wrong status / error reply: " + data.encode())
-//      }
-//    }
-//  }
+  @Test
+  def testBintrayRegister() {
+    registerModule(validBintrayModName, Some("bintray")) onComplete handleFailure { data =>
+      Option(data.getString("status")) match {
+        case Some("ok") => testComplete()
+        case _ => fail("wrong status / error reply: " + data.encode())
+      }
+    }
+  }
 
   @Test
   def testCustomMavenRegister() {
-    registerModule(validModName, Some("mavenCustom"), Some("http://repo1.maven.org/maven2/")) onComplete handleFailure { data =>
+    registerModule(validModName, Some("mavenOther"), Some("http://repo1.maven.org/maven2/")) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("ok") => testComplete()
         case _ => fail("wrong status / error reply: " + data.encode())
@@ -168,6 +168,39 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
             }
           }
         case None => fail("should get a count 0, but got none")
+      }
+    }
+  }
+
+  @Test
+  def testCountAfterRegistering() {
+    (for {
+      _ <- registerModule(validModName)
+      _ <- registerModule(validModName2)
+      obj <- countModules
+    } yield obj) onComplete handleFailure { obj =>
+      Option(obj.getInteger("count")) match {
+        case Some(count) =>
+          assertEquals("should have 2 modules registered", 2, count)
+          testComplete()
+        case None => fail("should get count 2, but got none")
+      }
+    }
+  }
+
+  @Test
+  def testCountAfterDeleting() {
+    (for {
+      _ <- registerModule(validModName)
+      _ <- registerModule(validModName2)
+      _ <- deleteModule(validModName)
+      obj <- countModules
+    } yield obj) onComplete handleFailure { obj =>
+      Option(obj.getInteger("count")) match {
+        case Some(count) =>
+          assertEquals("should have 1 module registered", 1, count)
+          testComplete()
+        case None => fail("should get count 1, but got none")
       }
     }
   }

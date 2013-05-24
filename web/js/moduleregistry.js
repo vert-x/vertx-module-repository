@@ -337,7 +337,7 @@ function registering() {
       $('#registrationFormAdditional .label').text('No additional information needed');
       $('#registerFormAdditionalURL').slideUp();
       $('#registerFormAdditionalURL').attr('disabled', true);
-    } else if (value === 'mavenCustom') {
+    } else if (value === 'mavenOther') {
       $('#registrationFormAdditional .label').text('Maven prefix URL');
       $('#registerFormAdditionalURL').slideDown();
       $('#registerFormAdditionalURL').attr('placeholder', 'http://maven.my-company.com/maven2/');
@@ -345,11 +345,6 @@ function registering() {
       $('#registrationFormAdditional .label').text('No additional information needed');
       $('#registerFormAdditionalURL').attr('disabled', true);
       $('#registerFormAdditionalURL').slideUp();
-    } else { // other url
-      $('#registrationFormAdditional .label').text('URL for the Maven repository root');
-      $('#registerFormAdditionalURL').slideDown();
-      $('#registerFormAdditionalURL')
-          .attr('placeholder', 'http://www.my-company.com/my-module.zip');
     }
   }
   $('input[name="location"]', '#registerForm').change(checkAdditionalInfos);
