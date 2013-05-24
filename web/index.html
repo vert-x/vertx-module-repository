@@ -21,6 +21,9 @@
 				<button id="logoutBtn">Logout</button>
 			</div>
 		</div>
+		<div id="faqContainer">
+			<button id="faqLink">How does it work?</button>
+		</div>
 	</div>
 	<div id="main">
 		<div class="intro">
@@ -30,12 +33,15 @@
 					id="moduleCount"></a> modules in the database.
 			</p>
 		</div>
+		<div id="faq">
+			<h2>How does it work?</h2>
+			<p>Here follows the text that purplefox wants to write. :)</p>
+		</div>
 		<div id="search">
 			<div id="searchControls">
 				<form id="searchForm">
 					<label id="slideItLabel">Slide results? <input type="checkbox" id="slideIt"
-						name="slideIt" /></label> <input type="text" placeholder="Search ..."
-						id="searchFor" name="search" />
+						name="slideIt" /></label> <input type="text" placeholder="Search ..." id="searchFor" name="search" />
 					<button id="searchModules" class="searchBtn" type="submit">Search</button>
 					<button id="listUnapprovedModules" class="searchBtn authed">Unapproved</button>
 					<button id="listAllModules" class="searchBtn">All</button>
@@ -69,9 +75,7 @@
 				</div>
 				<div id="pagerControls">
 					<button id="pagerLeft" disabled="disabled">&lt;&lt;</button>
-					<form method="post" action="#" id="pagerPage">
-						<input type="number" value="1" />
-					</form>
+					<input id="pagerPage" type="number" value="1" />
 					<button id="pagerRight">&gt;&gt;</button>
 				</div>
 			</div>
@@ -98,17 +102,17 @@
 										<a href="#"><img src="images/help.png" /></a>
 									</div>
 									<div class="text">
-										Please provide the identifier of your module so it can be verified. For modules in a Maven repository
-                    this will look like:
+										Please provide the identifier of your module so it can be verified. For modules in a Maven
+										repository this will look like:
 										<pre>groupID~artifactID~version</pre>
 										For example
 										<pre>io.vertx~mod-mongo-persistor~2.0.0-beta2</pre>
-                    For bintray modules it will look something like:
-                    <pre>owner~module-name~version</pre>
-                    For example
-                    <pre>purplefox~my-mod~1.0.0</pre>
-                    Your module must already be in a Maven or bintray repository.
-										Please note that we don't accept SNAPSHOT releases.
+										For bintray modules it will look something like:
+										<pre>owner~module-name~version</pre>
+										For example
+										<pre>purplefox~my-mod~1.0.0</pre>
+										Your module must already be in a Maven or bintray repository. Please note that we don't
+										accept SNAPSHOT releases.
 									</div>
 								</div>
 							</fieldset>
@@ -134,7 +138,8 @@
 												<a href="#"><img src="images/help.png" /></a>
 											</div>
 											<div class="text">
-												If your module resides in a Maven repository other than Maven Central then select this. You also need to provide the prefix URL for it. For example
+												If your module resides in a Maven repository other than Maven Central then select this.
+												You also need to provide the prefix URL for it. For example
 												<pre>https://repository.jboss.org/nexus/content/groups/public-jboss/</pre>
 											</div>
 										</div></li>
@@ -156,7 +161,8 @@
 								<legend>Additional information</legend>
 								<div id="registrationFormAdditional">
 									<label><input type="url" id="registerFormAdditionalURL" name="modURL"
-										disabled="disabled" /> <span class="label">Maven prefix</span></label>
+										placeholder="http://maven.my-company.com/maven2/" disabled="disabled" /> <span
+										class="label">Maven prefix</span></label>
 								</div>
 							</fieldset>
 						</div>

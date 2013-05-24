@@ -133,7 +133,7 @@ function validSearchPage(a) {
     $('#pagerRight').attr('disabled', false);
   }
 
-  $('#pagerPage input').val(searchPage + 1);
+  $('#pagerPage').val(searchPage + 1);
 
   return searchPage;
 }
@@ -220,9 +220,9 @@ function searching() {
     searchIt(lastSearch, false);
   });
 
-  $('#pagerPage').submit(function(e) {
+  $('#pagerPage').change(function(e) {
     e.preventDefault();
-    searchPage = validSearchPage($(this).find('input').val() - 1);
+    searchPage = validSearchPage($(this).val() - 1);
     searchIt(lastSearch, false);
   });
 
@@ -347,11 +347,11 @@ function registering() {
           additionalURL.removeAttr('disabled');
           console.log('disabled? ' + additionalURL.is(':disabled'));
 
-          /* this fixes a chrome bug to refresh the disabled attribute correctly */
+          /* this fixes a webkit bug to refresh the disabled attribute correctly */
           additionalURL.hide();
           setTimeout(function() {
-            additionalURL.show()
-          }, 1);
+            additionalURL.show();
+          }, 0);
         }
       });
     } else if (value === 'bintray') {
@@ -529,9 +529,27 @@ function randomizeFooter() {
   $('#footer .randomName').click();
 }
 
+function faq() {
+
+  $('#faqLink').click(function(e) {
+    e.preventDefault();
+    $('#faq').slideToggle();
+  });
+
+  $('#faqClose').click(function(e) {
+    e.preventDefault();
+    $('#faq').slideUp();
+  });
+
+  if (document.location.search.substr(1,document.location.search.length) === 'faq') {
+    $('#faqLink').click();
+  }
+}
+
 function init() {
   processSearchResults = initSearchResultProcessor();
   countModules();
+  faq();
   authentication();
   searching();
   registering();
