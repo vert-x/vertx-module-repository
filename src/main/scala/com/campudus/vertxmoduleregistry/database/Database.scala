@@ -8,6 +8,9 @@ import com.campudus.vertx.helpers.VertxScalaHelpers
 import scala.concurrent.Promise
 import scala.concurrent.Future
 import java.util.UUID
+import java.util.Date
+import java.util.Calendar
+import java.text.SimpleDateFormat
 
 object Database extends VertxScalaHelpers {
 
@@ -72,6 +75,10 @@ object Database extends VertxScalaHelpers {
       js
     }
 
+    private def formatTime(time: Long): String = {
+      new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z").format(new Date(time))
+    }
+
     def toWaitForApprovalEmailString(): String = {
       s"""There is a new module waiting for approval in the module registry.
 
@@ -81,7 +88,7 @@ object Database extends VertxScalaHelpers {
    - Homepage: ${homepage}
    - Keywords: ${keywords}
    - Author: ${author}
-   - Time registered: ${timeRegistered}
+   - Time registered: ${formatTime(timeRegistered)}
 
 Please approve this module soon! :)
 
