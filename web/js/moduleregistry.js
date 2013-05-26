@@ -70,6 +70,7 @@ function formatTime(time) {
 }
 
 function searchIt(query, searchUpdated) {
+  var countParams, getStuff;
   $('#searchedForText').addClass('loading');
   if ($('#slideIt').is(':checked')) {
     $('#searchResults').slideUp();
@@ -89,7 +90,9 @@ function searchIt(query, searchUpdated) {
   if (!searchUpdated) {
     getStuff();
   } else {
-    $.getJSON('/count', query.params, function(reply) {
+    countParams = query.params;
+    countParams.unapproved = (query.url === '/unapproved') ? 1 : 0;
+    $.getJSON('/count', countParams, function(reply) {
       if (reply.status === 'ok') {
         searchMaxModules = reply.count;
       } else {
@@ -119,7 +122,7 @@ function countModules() {
 }
 
 function validSearchPage(a) {
-  var firstPage = 0
+  var firstPage = 0;
   var lastPage = Math.max(0, Math.ceil(searchMaxModules / entriesPerPage) - 1);
   searchPage = Math.max(firstPage, Math.min(lastPage, a));
   if (searchPage === firstPage) {
@@ -283,7 +286,7 @@ function searching() {
       'params' : {
         'sessionID' : sessionID
       }
-    });
+    }, true);
   });
 }
 
@@ -345,7 +348,6 @@ function registering() {
       additionalURL.slideDown({
         'complete' : function() {
           additionalURL.removeAttr('disabled');
-          console.log('disabled? ' + additionalURL.is(':disabled'));
 
           /* this fixes a webkit bug to refresh the disabled attribute correctly */
           additionalURL.hide();

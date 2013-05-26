@@ -175,11 +175,12 @@ Thanks!"""
     p.future
   }
 
-  def countModules(vertx: Vertx): Future[Int] = {
+  def countModules(vertx: Vertx, countUnapproved: Boolean): Future[Int] = {
     val p = Promise[Int]
     val params = json
       .putString("action", "count")
       .putString("collection", "modules")
+      .putObject("matcher", json.putBoolean("approved", !countUnapproved))
 
     vertx.eventBus().send(dbAddress, params, { msg: Message[JsonObject] =>
       msg.body.getString("status") match {

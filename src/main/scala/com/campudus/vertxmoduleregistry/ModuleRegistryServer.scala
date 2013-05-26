@@ -93,7 +93,11 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     })
 
     rm.get("/count", { implicit req: HttpServerRequest =>
-      countModules(vertx) onComplete {
+      val unapproved = Option(req.params().get("unapproved")) match {
+        case Some("1") => true
+        case _ => false
+      }
+      countModules(vertx, unapproved) onComplete {
         case Success(count) =>
           req.response.end(json.putString("status", "ok").putNumber("count", count).encode)
         case Failure(error) => respondFailed(error.getMessage())
