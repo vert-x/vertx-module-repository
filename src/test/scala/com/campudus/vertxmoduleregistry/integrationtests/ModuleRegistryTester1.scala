@@ -95,7 +95,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
       deleteModule(modName)
     } onComplete handleFailure { data =>
       Option(data.getString("status")) match {
-        case Some("ok") => countModules onComplete handleFailure { obj =>
+        case Some("ok") => countModules() onComplete handleFailure { obj =>
           Option(obj.getInteger("count")) match {
             case Some(count) =>
               assertEquals("should have 0 modules registered after delete", 0, count)
@@ -163,12 +163,37 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
+  def testListUnapprovedModules() {
+    for {
+      _ <- registerModule(validModName)
+      _ <- approveModules
+      _ <- registerModule(validModName2)
+    } yield {
+      val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+      noExceptionInClient(client)
+
+      getJson(client, "/list")
+    } onComplete handleFailure { obj =>
+      Option(obj.getArray("modules")) match {
+        case Some(results) =>
+          assertEquals(1, results.size())
+          testComplete()
+        case None => fail("should get results but got none")
+      }
+    }
+  }
+
+  @Test
   def testCount() {
-    countModules onComplete handleFailure { obj =>
+    countModules() onComplete handleFailure { obj =>
       Option(obj.getInteger("count")) match {
         case Some(count) =>
           assertEquals("should have 0 modules registered", 0, count)
-          registerModule(validModName) flatMap (_ => countModules) onComplete handleFailure { obj =>
+          (for {
+            m <- registerModule(validModName)
+            _ <- approveModules
+            obj <- countModules()
+          } yield obj) onComplete handleFailure { obj =>
             Option(obj.getInteger("count")) match {
               case Some(count) =>
                 assertEquals("should have 1 module registered", 1, count)
@@ -182,11 +207,43 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
+  def countUnapproved() {
+    for {
+      _ <- registerModule(validModName)
+      _ <- registerModule(validModName2)
+    } yield countModules(Some(false)) onComplete handleFailure { obj =>
+      Option(obj.getInteger("count")) match {
+        case Some(count) =>
+          assertEquals("should have 0 (approved) modules registered", 0, count)
+          testComplete()
+        case None => fail("should get count 0, but got none")
+      }
+    }
+  }
+
+  @Test
+  def countWhenUnapproved() {
+    for {
+      _ <- registerModule(validModName)
+      _ <- registerModule(validModName2)
+    } yield countModules(Some(true)) onComplete handleFailure { obj =>
+      Option(obj.getInteger("count")) match {
+        case Some(count) =>
+          assertEquals("should have 2 modules registered", 2, count)
+          testComplete()
+        case None => fail("should get count 2, but got none")
+      }
+    }
+  }
+
+  @Test
   def testCountAfterRegistering() {
     (for {
       _ <- registerModule(validModName)
+      _ <- approveModules
       _ <- registerModule(validModName2)
-      obj <- countModules
+      _ <- approveModules
+      obj <- countModules()
     } yield obj) onComplete handleFailure { obj =>
       Option(obj.getInteger("count")) match {
         case Some(count) =>
@@ -202,8 +259,9 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
     (for {
       _ <- registerModule(validModName)
       _ <- registerModule(validModName2)
+      _ <- approveModules()
       _ <- deleteModule(validModName)
-      obj <- countModules
+      obj <- countModules()
     } yield obj) onComplete handleFailure { obj =>
       Option(obj.getInteger("count")) match {
         case Some(count) =>
