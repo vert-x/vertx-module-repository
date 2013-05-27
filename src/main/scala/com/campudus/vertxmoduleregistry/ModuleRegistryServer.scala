@@ -129,12 +129,19 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
         implicit val errorBuffer = collection.mutable.ListBuffer[String]()
 
         val sessionID = getRequiredParam("sessionID", "Session ID required")
+        val by = getOptionalParam("by")
+        val desc = getOptionalParam("desc") match {
+          case Some("1") => true
+          case _ => false
+        }
+        val limit = getOptionalParam("limit") flatMap toInt
+        val skip = getOptionalParam("skip") flatMap toInt
 
         val errors = errorBuffer.result
         if (errors.isEmpty) {
 
           def callUnapproved() = {
-            unapproved(vertx) onComplete {
+            unapproved(vertx, by, limit, skip, desc) onComplete {
               case Success(modules) =>
                 val modulesArray = new JsonArray()
                 modules.map(_.toJson).foreach(m => modulesArray.addObject(m))

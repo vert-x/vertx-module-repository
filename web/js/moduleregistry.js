@@ -1,4 +1,4 @@
-var entriesPerPage, errorDialog, lastSearch, moduleCount, processSearchResults, searchMaxModules, searchPage = 0, sessionID;
+var entriesPerPage, errorDialog, lastSearch, moduleCount, processSearchResults, searchMaxModules, searchPage = 0, sessionID = null;
 
 entriesPerPage = 4;
 
@@ -44,7 +44,7 @@ function dialogs() {
 }
 
 function isAuthed() {
-  return typeof sessionID !== 'undefined';
+  return sessionID !== null;
 }
 
 function formatTime(time) {
@@ -70,7 +70,7 @@ function formatTime(time) {
 }
 
 function searchIt(query, searchUpdated) {
-  var countParams, getStuff;
+  var countParams, getStuff, sessionId, skip;
   $('#searchedForText').addClass('loading');
   if ($('#slideIt').is(':checked')) {
     $('#searchResults').slideUp();
@@ -79,18 +79,21 @@ function searchIt(query, searchUpdated) {
   lastSearch.params.limit = entriesPerPage;
   lastSearch.params.skip = searchPage * entriesPerPage;
 
-  var getStuff = function() {
-    if (query.method === 'post') {
-      $.post(query.url, lastSearch.params, processSearchResults(query.title), 'json');
-    } else {
-      $.getJSON(query.url, lastSearch.params, processSearchResults(query.title));
-    }
-  };
-
   if (!searchUpdated) {
-    getStuff();
+    if (lastSearch.method === 'post') {
+      $.post(lastSearch.url, lastSearch.params, processSearchResults(lastSearch.title), 'json');
+    } else {
+      $.getJSON(lastSearch.url, lastSearch.params, processSearchResults(lastSearch.title));
+    }
   } else {
-    countParams = query.params;
+    sessionId = lastSearch.params.sessionID;
+    skip = lastSearch.params.skip;
+
+    delete lastSearch.params.sessionID;
+    delete lastSearch.params.skip;
+
+    countParams = lastSearch.params;
+
     countParams.unapproved = (query.url === '/unapproved') ? 1 : 0;
     $.getJSON('/count', countParams, function(reply) {
       if (reply.status === 'ok') {
@@ -98,9 +101,19 @@ function searchIt(query, searchUpdated) {
       } else {
         searchMaxModules = moduleCount;
       }
+
       validSearchPage(searchPage);
-      getStuff();
+      lastSearch.params.skip = searchPage * entriesPerPage;
+
+      if (lastSearch.method === 'post') {
+        $.post(lastSearch.url, lastSearch.params, processSearchResults(lastSearch.title), 'json');
+      } else {
+        $.getJSON(lastSearch.url, lastSearch.params, processSearchResults(lastSearch.title));
+      }
     });
+
+    lastSearch.params.sessionID = sessionId;
+    lastSearch.params.skip = searchPage * entriesPerPage;
   }
 }
 
@@ -155,6 +168,7 @@ function authentication() {
       password : $('#loginFormPassword').val()
     }, function(data) {
       loginErrors.hide();
+      $('#loginFormPassword').val('');
       if (data.status === 'ok') {
         sessionID = data.sessionID;
 
@@ -163,7 +177,6 @@ function authentication() {
 
         $('#listUnapprovedModules').click();
 
-        $('#loginFormPassword').val('');
         dismissDialog('login');
       } else if (data.status === 'error') {
         loginErrors.text(data.messages.join(', '));
@@ -180,14 +193,13 @@ function authentication() {
     $.post('/logout', {
       'sessionID' : sessionID
     }, function(data) {
-      delete sessionID;
-      if (data.status === 'ok') {
-        $('.authed').hide();
-        $('.unauthed').show();
+      sessionID = null;
+      alert('sessionID: ' + sessionID);
+      $('.authed').hide();
+      $('.unauthed').show();
 
-        $('#listAllModules').click();
-        showDialog('info', 'Successfully logged out.', true);
-      }
+      $('#listAllModules').click();
+      showDialog('info', 'Successfully logged out.', true);
     }, 'json');
   });
 }
@@ -322,7 +334,9 @@ function registering() {
               text += '<p>Could not notify moderators, please notify them through IRC'
                   + ' or via the mailing list to get your module approved quickly.</p>';
             }
-            $('#registerForm input').val("");
+            $('#registerForm input[name="location"]').get(0).click();
+            $('#registerForm input[name="name"]').val('');
+            $('#registerForm input[name="modURL"]').val('');
             showDialog('info', text, true);
           } else if (reply.status === 'error') {
             if (reply.message) {
@@ -460,7 +474,8 @@ function initSearchResultProcessor() {
                   if (reply.status === 'ok') {
                     showDialog('info', 'The module was removed!', true);
                   } else {
-                    showDialog('error', 'Could not remove: ' + reply.messages.join(', '));
+                    showDialog('error', 'Could not remove: ' + (reply.message) ? reply.message
+                        : reply.messages.join(', '));
                   }
                 }, 'json');
               });
@@ -487,6 +502,15 @@ function initSearchResultProcessor() {
               addPart('Description', module.description);
               addPart('Author', module.author);
               addPart('Licenses', module.licenses.join(', '));
+
+              if (module.repoType === 'mavenCentral') {
+                addPart('Repository', 'Central Maven Repository');
+              } else if (module.repoType === 'mavenOther') {
+                addPart('Repository', 'Other / Custom Maven Repository');
+                addPart('Prefix', module.downloadUrl);
+              } else if (module.repoType === 'bintray') {
+                addPart('Repository', 'Bintray');
+              }
 
               if (module.homepage) {
                 addPart('Homepage', module.homepage);

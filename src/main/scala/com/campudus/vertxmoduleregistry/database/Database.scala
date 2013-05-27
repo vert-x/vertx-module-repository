@@ -225,8 +225,8 @@ Thanks!"""
     p.future
   }
 
-  def unapproved(vertx: Vertx): Future[List[Module]] = {
-    searchModules(vertx, None, Some("timeRegistered"), None, None, false, false)
+  def unapproved(vertx: Vertx, by: Option[String] = Some("timeRegistered"), limit: Option[Int] = None, skip: Option[Int] = None, desc: Boolean = false): Future[List[Module]] = {
+    searchModules(vertx, None, by, limit, skip, desc, false)
   }
 
   def remove(vertx: Vertx, id: String): Future[JsonObject] = {
