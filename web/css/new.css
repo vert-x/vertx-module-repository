@@ -1,0 +1,419 @@
+/* Dialog */
+.dialog {
+	background: #FFF;
+	border: 1px solid #445561;
+	color: #445561;
+	display: none;
+	padding: 10px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	margin-left: -200px;
+	z-index: 99999;
+	border-radius: 15px;
+}
+
+.dialog .text {
+	display: block;
+	line-height: 18px;
+	margin-top: 15px;
+	text-align: center;
+}
+
+.dialog .close {
+	float: right;
+	cursor: pointer;
+	margin: -15px -15px 0 0;
+}
+
+#errorDialog {
+	background-color: #B46C6C;
+	border-color: #B40000;
+	border-radius: 15px;
+	color: #000;
+}
+
+#mask {
+	display: none;
+	background: #000;
+	height: 100%;
+	left: 0;
+	opacity: 0.75;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 999;
+}
+
+#loginDialog button {
+	margin-top: 15px;
+	width: 100%;
+}
+
+#loginDialog .text {
+	color: #610000;
+}
+
+/* Regular styling */
+body {
+	margin: 0 5%;
+	font-family: 'Source Sans Pro';
+	color: #445561;
+}
+
+button {
+	background-color: #006DB4;
+	border-color: #FFF;
+	border-radius: 3px;
+	border-width: 0px;
+	color: #FFF;
+	font-size: 16px;
+	font-weight: 700;
+	padding: 5px 10px;
+}
+
+button:disabled {
+	background-color: #87A2B4;
+	color: #FFF;
+}
+
+a {
+	color: #006DB4;
+	text-decoration: none;
+}
+
+h1,h2,h3,h4 {
+	color: #006DB4;
+	font-weight: 300;
+}
+
+h1 {
+	font-size: 42px;
+}
+
+h2 {
+	font-size: 24px;
+}
+
+h3 {
+	font-size: 20px;
+}
+
+fieldset {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+
+fieldset legend {
+	font-weight: bold;
+}
+
+::-webkit-input-placeholder {
+	color: #bbb;
+}
+
+:-moz-placeholder {
+	color: #bbb;
+}
+
+::-moz-placeholder {
+	color: #bbb;
+}
+
+:-ms-input-placeholder {
+	color: #bbb;
+}
+
+input[type="text"],input[type="url"],input[type="number"] {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 4px;
+	box-shadow: 1px 1px 5px #DFDFDF inset;
+}
+
+#header {
+	position: relative;
+}
+
+#authContainer {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#faqContainer {
+	position: absolute;
+	top: 0;
+	right: 80px;
+}
+
+#faq {
+	display: none;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+
+#search {
+	position: relative;
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 20px;
+	margin-bottom: 15px;
+}
+
+#searchControls {
+	float: right;
+}
+
+#slideItLabel {
+	margin-right: 10px;
+}
+
+#searchedForText {
+	display: block;
+	padding: 5px;
+	border-bottom: 1px solid #ccc;
+}
+
+#searchedForText.loading {
+	padding-left: 30px;
+	background-image: url("../images/loading.gif");
+	background-position: left;
+	background-repeat: no-repeat;
+}
+
+#resultControls {
+	float: right;
+	margin-right: 15px;
+}
+
+#pagerControls {
+	margin: 15px 15px 0 0;
+	text-align: center;
+}
+
+#pagerPage {
+	display: inline;
+	width: 30px;
+	padding: 3px;
+	text-align: center;
+}
+
+#results ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+#results>ul {
+	border-bottom: 1px dotted #445561;
+}
+
+#results>ul>li {
+	cursor: pointer;
+	padding: 5px;
+	border-top: 1px dotted #445561;
+	padding: 5px;
+}
+
+#results>ul>li .name {
+	float: left;
+}
+
+#results>ul>li .registered {
+	float: right;
+}
+
+#results>ul>li .generalInfos:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+#results .extraInfoControls {
+	text-align: right;
+}
+
+#results .extraInfos {
+	margin: 10px;
+	border: 1px solid #445561;
+	background-color: #fff;
+	border-radius: 5px;
+	padding: 10px;
+	box-shadow: 0 0 10px #DFDFDF inset;
+}
+
+#results .extraInfos .key {
+	float: left;
+}
+
+#results .extraInfos .value {
+	float: right;
+}
+
+#results .extraInfos .infoPart:nth-child(odd) {
+	border-radius: 0;
+	border-bottom: 1px dotted #999;
+}
+
+#results .extraInfos .infoPart:nth-child(even) {
+	background-color: #fcfcfc;
+	border-radius: 0;
+	border-bottom: 1px dotted #999;
+	border-radius: 0;
+}
+
+#results .extraInfos .infoPart:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+#results>ul>li:nth-child(odd) {
+	background-color: #FAFAFA;
+}
+
+#results>ul>li:nth-child(even) {
+	background-color: #F0F0F0;
+}
+
+#registerForm .help .controls {
+	float: right;
+}
+
+#registerForm .help:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+#registerForm .col {
+	width: 30%;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin-right: 3%;
+}
+
+#registerForm fieldset {
+	width: 100%;
+}
+
+#registerForm input[type="text"],#registerForm input[type="url"] {
+	display: block;
+	width: 100%;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin-right: 30px;
+	margin-bottom: 5px;
+}
+
+#registerForm ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+#registerForm li {
+	display: block;
+}
+
+#registerForm button {
+	width: 250px;
+}
+
+#footer {
+	margin-top: 20px;
+	border-top: 1px solid #DBDBDB;
+	color: #888;
+	font: 12px/1.5em Arial, sans-serif;
+	text-align: center;
+	border-top: 1px solid #DBDBDB;
+}
+
+#footer ul {
+	list-style-type: none;
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	margin: 0;
+}
+
+#footer ul li {
+	float: left;
+	margin: 15px;
+	margin-right: 40px;
+}
+
+#footer ul:after {
+	content: ".";
+	display: block;
+	height: 15px;
+	clear: both;
+	visibility: hidden;
+}
+
+#footer .randomName {
+	cursor: pointer;
+}
+
+.code {
+	border: 1px solid #ddd;
+	background-color: #eee;
+	font-family: 'Monospace';
+}
+
+div .help {
+	display: inline;
+}
+
+div .help .controls {
+	display: inline;
+}
+
+div .help .text {
+	margin: 10px;
+	padding: 5px;
+	border: 1px solid #DBDBDB;
+	background-color: #fff;
+	border-radius: 5px;
+	padding: 5px;
+	box-shadow: 0 0 10px #DFDFDF inset;
+	word-wrap: break-word;
+	overflow: hidden;
+}
+
+.col {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.columns:after {
+	content: ".";
+	display: block;
+	height: 15px;
+	clear: both;
+	visibility: hidden;
+}
+
+/* Hide stuff */
+.dialog,.template,.authed,.error,.extraInfos,.noResults,.help .text {
+	display: none;
+}
+
+#resultControls,#registrationFormContainer {
+	display: none;
+}
+
+.unauthed {
+	display: inherit;
+}

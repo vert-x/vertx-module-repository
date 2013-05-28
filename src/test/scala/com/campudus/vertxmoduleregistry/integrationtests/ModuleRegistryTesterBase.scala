@@ -22,6 +22,8 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
   val TEMP_DIR = System.getProperty("java.io.tmpdir")
 
   val validModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta2"
+  val validModName2: String = "io.vertx~mod-auth-mgr~2.0.0-beta2"
+  val validBintrayModName: String = "timvolpe~mod-test~1.0.0-beta1"
   val invalidModName: String = "mod-mongo-persistor~2.0.0-beta2"
   val snapshotModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta3-SNAPSHOT"
 
@@ -31,8 +33,8 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
   override def start(startedResult: org.vertx.java.core.Future[Void]) {
     // clean up temp files and directory
     val dirContent = readDir(TEMP_DIR)
-    dirContent.map( array => array.filter(isModule).foreach(new File(_).delete()))
-    dirContent.map( array => array.filter(isTemporaryDir).foreach(new File(_).delete()))
+    dirContent.map(array => array.filter(isModule).foreach(new File(_).delete()))
+    dirContent.map(array => array.filter(isTemporaryDir).foreach(new File(_).delete()))
 
     container.deployModule(System.getProperty("vertx.modulename"),
       createJson(),
@@ -53,7 +55,7 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
       })
   }
 
-  def createJson() : JsonObject
+  def createJson(): JsonObject
 
   protected def handleFailure[T](doSth: T => Unit): Function1[Try[T], Any] = {
     case Success(x) => doSth(x)
@@ -94,6 +96,57 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
     }
   }
 
+  protected def login() = {
+    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+    noExceptionInClient(client)
+    postJson(client, "/login", "password" -> approverPw) map (_.getString("sessionID"))
+  }
+
+  protected def listUnapproved(sid: String) = {
+    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+    noExceptionInClient(client)
+    postJson(client, "/unapproved", "sessionID" -> sid) map (_.getArray("modules"))
+  }
+
+  protected def approveModule(sessionId: String, moduleId: String) = {
+    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+    noExceptionInClient(client)
+
+    import scala.collection.JavaConversions._
+    login flatMap { sid =>
+      postJson(client, "/approve", "sessionID" -> sessionId, "_id" -> moduleId)
+    }
+  }
+
+  protected def approveModules() = {
+    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+    noExceptionInClient(client)
+
+    import scala.collection.JavaConversions._
+    login flatMap { sid =>
+      listUnapproved(sid) map (_.toList) flatMap { modules =>
+        Future.sequence(modules map { m =>
+          postJson(client, "/approve",
+            "sessionID" -> sid,
+            "_id" -> m.asInstanceOf[JsonObject].getString("_id"))
+        })
+      }
+    }
+  }
+
+  protected def countModules(unapproved: Option[Boolean] = None) = {
+    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+    noExceptionInClient(client)
+
+    unapproved match {
+      case Some(x) => getJson(client, "/count", "unapproved" -> (x match {
+        case true => "1"
+        case false => "0"
+      }))
+      case None => getJson(client, "/count")
+    }
+  }
+
   protected def deleteModule(modName: String) = {
     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
     noExceptionInClient(client)
@@ -104,11 +157,31 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
     }
   }
 
- protected def registerModule(modName: String): Future[JsonObject] = {
+  protected def registerModule(modName: String, modLocation: Option[String] = None, modURL: Option[String] = None): Future[JsonObject] = {
     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
     noExceptionInClient(client)
 
-    postJson(client, "/register", "modName" -> modName)
+    val params = List(Some("modName" -> modName),
+      modLocation.map("modLocation" -> _),
+      modURL.map("modURL" -> _))
+    postJson(client, "/register", params.flatten: _*)
+  }
+
+  protected def registerAndApprove(modName: String, modLocation: Option[String] = None, modURL: Option[String] = None): Future[JsonObject] = {
+    val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
+    noExceptionInClient(client)
+
+    val params = List(Some("modName" -> modName),
+      modLocation.map("modLocation" -> _),
+      modURL.map("modURL" -> _))
+
+    for {
+      m <- postJson(client, "/register", params.flatten: _*)
+      sid <- login
+      am <- approveModule(sid, m.getString("_id"))
+    } yield {
+      am
+    }
   }
 
   protected def noExceptionInClient(client: HttpClient) = client.exceptionHandler({ ex: Throwable =>
