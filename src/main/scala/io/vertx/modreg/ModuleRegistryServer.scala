@@ -364,6 +364,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
 
     val config = Option(container.config()).getOrElse(json)
     val host = config.getString("host", "localhost")
+    logger.info("port port port is " + config.getNumber("port"));
     val port = config.getNumber("port", 8080)
     val ssl = config.getString("keystore-path") != null && config.getString("keystore-pass") != null
 
@@ -371,6 +372,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     logger.info("port: " + port)
     logger.info("this path: " + new File(".").getAbsolutePath())
     logger.info("webpath: " + webPath)
+    logger.info("ssl: " + ssl)
 
     if (ssl) {
       vertx.createHttpServer()
