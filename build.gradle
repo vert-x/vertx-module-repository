@@ -73,6 +73,7 @@ Please edit the details below.
  */
 def configurePom(def pom) {
   pom.project {
+    name rootProject.name
     description 'The Vert.x module registry'
     inceptionYear '2013'
     packaging 'zip'
