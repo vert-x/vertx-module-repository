@@ -8,6 +8,8 @@ cd $OPENSHIFT_REPO_DIR
 
 echo "Starting Vert.x application!"
 
+echo "Path is $PATH"
+
 vertx runmod ${MODULE_NAME} -conf "${OPENSHIFT_DATA_DIR}/config.json" &> "${OPENSHIFT_DIY_LOG_DIR}vert.x.log" &
 echo $! > ${OPENSHIFT_DATA_DIR}/application.pid
 
