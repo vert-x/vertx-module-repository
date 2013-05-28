@@ -72,9 +72,7 @@ function formatTime(time) {
 function searchIt(query, searchUpdated) {
   var countParams, getStuff, sessionId, skip;
   $('#searchedForText').addClass('loading');
-  if ($('#slideIt').is(':checked')) {
-    $('#searchResults').slideUp();
-  }
+  $('#searchResults').slideUp();
   lastSearch = query;
   lastSearch.params.limit = entriesPerPage;
   lastSearch.params.skip = searchPage * entriesPerPage;
@@ -414,11 +412,6 @@ function initSearchResultProcessor() {
         results.hide();
         resultControls.hide();
         pagerControls.hide();
-        if ($('#slideIt').is(':checked')) {
-          $('#searchResults').slideDown();
-        } else {
-          $('#searchResults').show();
-        }
 
         if (data.status === 'error') {
           error.text(data.messages.join(', '));
@@ -531,6 +524,8 @@ function initSearchResultProcessor() {
           error.text('Something unexpected happened! :O');
           error.fadeIn();
         }
+
+        $('#searchResults').slideDown();
       };
     }
   }());

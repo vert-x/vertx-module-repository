@@ -35,55 +35,79 @@
 		</div>
 		<div id="faq">
 			<h2>How does it work?</h2>
-      <p>This site maintains a directory of Vert.x modules, and allows anyone to list and search for available modules.</p>
-      <h3>Searching and Listing Modules</h3>
-      <p>Please note that we don't maintain the actual modules here we just maintain a database of meta-data about the modules.
-      The actual modules can live in any Maven repository (e.g. Maven Central or another public Maven repository), or in <a href="http://bintray.com">bintray</a>.</p>
-      <p>You can search for modules by entering a search string in the search box and hitting the 'Search' button. You can list all modules
-      by hitting the 'All Modules' button. Search results can ordered by date or name.</p>
-      <h2>I've found a module - now what?</h2>
-      <p>Once you've found a module that you want to use simply make a note of its name, and use that name in your application when deploying a module.
-      Vert.x will lazily download and install the module the first time it is needed. Alternatively you can run 'vertx install module_name' at the command line
-      to force it to download and install.</p>
-      <p>If the module you want to use is not in Maven Central or bintray then you will also need to add the url of the repository root to 'repos.txt' in your Vert.x installation.</p>
-      <h3>Registering your own modules</h3>
-      <p>Anyone can register modules in this site. By registering your module on this site you are publishing it so it can be used by other Vert.x users.
-      You don't have to register your Vert.x modules, but by doing so you are ensuring they are seen by the widest audience.</p>
-      <p>To register your module simply fill in the register form at the bottom of the page. If your module lives in Maven Central or
-      bintray then you just need to provide the name of your module to register it. If your module lives in some other Maven
-      repository you will also need to provide the URI for the root of that repository.</p>
-      <p>In order to be registered successfully modules must contain the following mandatory fields in mod.json:</p>
-      <ul>
-        <li>description - Text description of what the module does</li>
-        <li>licenses - JSON array of licenses used in the module</li>
-        <li>author - Main author of the module (individual or organisation</li>
-      </ul>
-      <p>There are also some optional fields that we highly recommend that you fill in too:</p>
-      <ul>
-        <li>keywords - JSON array of keywords that describe the module - these are used when searching.</li>
-        <li>homepage - URL of the project website</li>
-        <li>contributors - JSON array of other contributors to the module.</li>
-      </ul>
-      <p>Once a module has been submitted an email will be sent to the moderators, will then take a look at the module and approve
-      it if all is ok. Once the module has been approved it will be visible on the site for others to list and search</p>
-      <h3>How do I get my module in Maven Central or bintray?</h3>
-      <p>Many JVM users are already familiar with pushing artifacts to Maven repositories such as Maven Central, and if you are one of those users, putting
-      your modules in Maven Central might be the natural thing to do.</p>
-      <p>The Vert.x Gradle template project and the Vert.x Maven archetype are already setup to easily deploy modules to Maven. If you don't already have an account to do this please take a look at the Maven/Sonatype documentation for information on how to open
-      an oss.sonatype.org account so you can stage artifacts for Maven Central.</p>
-      <p>For users who are not "Maven-centric" it might be easier to use <a href="http://bintray.com">bintray</a>. You can easily open a bintray account in seconds and upload your modules so they
-      are available. When putting a module in bintray you should put it in a repository called 'vertx-mods'. The package name should be the name of your module, and you should have a published
-      version corresponding to your module version. The module identifier is then created by taking your username followed by '~' followed by the module name, followed by '~', followed by the version.</p>
-      <p>Here is an <a href="https://bintray.com/version/show/general/timvolpe/vertx-mods/mod-test/1.0.0-beta1">example</a>:
-        In this case the module name that you enter in the registry should be: 'timvolpe~mod-test~1.0.0-beta1'
-      </p>
-      <p><b>Any problems? Drop a post on vertx@googlegroups.com</b></p>
+			<p>This site maintains a directory of Vert.x modules, and allows anyone to list and search
+				for available modules.</p>
+			<h3>Searching and Listing Modules</h3>
+			<p>
+				Please note that we don't maintain the actual modules here we just maintain a database of
+				meta-data about the modules. The actual modules can live in any Maven repository (e.g. Maven
+				Central or another public Maven repository), or in <a href="http://bintray.com">bintray</a>.
+			</p>
+			<p>You can search for modules by entering a search string in the search box and hitting the
+				'Search' button. You can list all modules by hitting the 'All Modules' button. Search results
+				can ordered by date or name.</p>
+			<h3>I've found a module - now what?</h3>
+			<p>Once you've found a module that you want to use simply make a note of its name, and use
+				that name in your application when deploying a module. Vert.x will lazily download and install
+				the module the first time it is needed. Alternatively you can run 'vertx install module_name' at
+				the command line to force it to download and install.</p>
+			<p>If the module you want to use is not in Maven Central or bintray then you will also need
+				to add the url of the repository root to 'repos.txt' in your Vert.x installation.</p>
+			<h3>Registering your own modules</h3>
+			<p>Anyone can register modules in this site. By registering your module on this site you are
+				publishing it so it can be used by other Vert.x users. You don't have to register your Vert.x
+				modules, but by doing so you are ensuring they are seen by the widest audience.</p>
+			<p>To register your module simply fill in the register form at the bottom of the page. If
+				your module lives in Maven Central or bintray then you just need to provide the name of your
+				module to register it. If your module lives in some other Maven repository you will also need to
+				provide the URI for the root of that repository.</p>
+			<p>In order to be registered successfully modules must contain the following mandatory fields
+				in mod.json:</p>
+			<ul>
+				<li>description - Text description of what the module does</li>
+				<li>licenses - JSON array of licenses used in the module</li>
+				<li>author - Main author of the module (individual or organisation</li>
+			</ul>
+			<p>There are also some optional fields that we highly recommend that you fill in too:</p>
+			<ul>
+				<li>keywords - JSON array of keywords that describe the module - these are used when
+					searching.</li>
+				<li>homepage - URL of the project website</li>
+				<li>developers - JSON array of other contributors to the module.</li>
+			</ul>
+			<p>Once a module has been submitted an email will be sent to the moderators, will then take a
+				look at the module and approve it if all is ok. Once the module has been approved it will be
+				visible on the site for others to list and search</p>
+			<h3>How do I get my module in Maven Central or bintray?</h3>
+			<p>Many JVM users are already familiar with pushing artifacts to Maven repositories such as
+				Maven Central, and if you are one of those users, putting your modules in Maven Central might be
+				the natural thing to do.</p>
+			<p>The Vert.x Gradle template project and the Vert.x Maven archetype are already setup to
+				easily deploy modules to Maven. If you don't already have an account to do this please take a
+				look at the Maven/Sonatype documentation for information on how to open an oss.sonatype.org
+				account so you can stage artifacts for Maven Central.</p>
+			<p>
+				For users who are not "Maven-centric" it might be easier to use <a href="http://bintray.com">bintray</a>.
+				You can easily open a bintray account in seconds and upload your modules so they are available.
+				When putting a module in bintray you should put it in a repository called 'vertx-mods'. The
+				package name should be the name of your module, and you should have a published version
+				corresponding to your module version. The module identifier is then created by taking your
+				username followed by '~' followed by the module name, followed by '~', followed by the version.
+			</p>
+			<p>
+				Here is an <a
+					href="https://bintray.com/version/show/general/timvolpe/vertx-mods/mod-test/1.0.0-beta1">example</a>:
+				In this case the module name that you enter in the registry should be:
+				'timvolpe~mod-test~1.0.0-beta1'
+			</p>
+			<p>
+				<b>Any problems? Drop a post on vertx@googlegroups.com</b>
+			</p>
 		</div>
 		<div id="search">
 			<div id="searchControls">
 				<form id="searchForm">
-					<label id="slideItLabel">Slide results? <input type="checkbox" id="slideIt"
-						name="slideIt" /></label> <input type="text" placeholder="Search ..." id="searchFor" name="search" />
+					<input type="text" placeholder="Search ..." id="searchFor" name="search" />
 					<button id="searchModules" class="searchBtn" type="submit">Search</button>
 					<button id="listUnapprovedModules" class="searchBtn authed">Unapproved</button>
 					<button id="listAllModules" class="searchBtn">All</button>
