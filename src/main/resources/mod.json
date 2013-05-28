@@ -1,3 +1,12 @@
 {
-  "main":"io.vertx.modreg.ModuleRegistryStarter"
+  "main":"io.vertx.modreg.ModuleRegistryStarter",
+
+  "description":"The Vert.x Module Registry. This maintains a searchable directory of Vert.x modules for use by the Vert.x community.",
+  "licenses": ["The Apache Software License Version 2.0"],
+  "author": "Joern Bernhardt",
+
+  "developers": ["purplefox"],
+  "keywords": ["registry", "directory", "catalogue", "catalog", "modules", "repository", "search", "list", "yellow pages"],
+  "homepage": "https://github.com/vert-x/vertx-module-registry"
+
 }
