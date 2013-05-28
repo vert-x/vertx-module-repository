@@ -26,7 +26,6 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
   val invalidModName: String = "mod-mongo-persistor~2.0.0-beta2"
   val snapshotModName: String = "io.vertx~mod-mongo-persistor~2.0.0-beta3-SNAPSHOT"
 
-  val incorrectDownloadUrl: String = "http://asdfreqw/"
   val approverPw: String = "password"
 
   override def start(startedResult: org.vertx.java.core.Future[Void]) {
@@ -207,7 +206,9 @@ abstract class ModuleRegistryTesterBase extends TestVerticle {
 
   protected def getJson(client: HttpClient, url: String, params: (String, String)*): Future[JsonObject] = {
     val p = Promise[JsonObject]
-    val request = client.get(url + params.map { case (key, value) => key + "=" + value }.mkString("?", "&", ""), { resp: HttpClientResponse =>
+    val uri = url + params.map { case (key, value) => key + "=" + value }.mkString("?", "&", "")
+    println("URI: " + uri)
+    val request = client.get(uri, { resp: HttpClientResponse =>
       resp.bodyHandler({ buf: Buffer =>
         try {
           p.success(new JsonObject(buf.toString()))

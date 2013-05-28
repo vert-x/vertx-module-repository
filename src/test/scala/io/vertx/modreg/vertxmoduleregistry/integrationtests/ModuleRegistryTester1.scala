@@ -9,7 +9,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   def createJson(): JsonObject = json.putString("approver-password", approverPw)
 
   @Test
-  def testRegisterSnapshotMod() {
+  def registerSnapshotMod() {
     registerModule(snapshotModName) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("error") => testComplete()
@@ -19,7 +19,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testRegisterInvalidMod() {
+  def registerInvalidMod() {
     registerModule(invalidModName) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("error") => testComplete()
@@ -29,7 +29,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testRegisterMod() {
+  def registerMod() {
     registerModule(validModName) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("ok") =>
@@ -42,7 +42,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testBintrayRegister() {
+  def bintrayRegister() {
     registerModule(validBintrayModName, Some("bintray")) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("ok") =>
@@ -55,7 +55,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testOtherMavenRegister() {
+  def otherMavenRegister() {
     registerModule(validModName, Some("mavenOther"), Some("http://repo1.maven.org/maven2/")) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("ok") =>
@@ -68,7 +68,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testRegisterModTwice() {
+  def registerModTwice() {
     registerModule(validModName) flatMap (_ => registerModule(validModName)) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("error") => testComplete()
@@ -78,7 +78,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testCleanupAfterRegister() {
+  def cleanupAfterRegister() {
     registerModule(validModName) flatMap (_ => checkIfZipExists zip checkIfTmpDirExists) onComplete handleFailure {
       case (true, true) => fail("Zip file and temp dir should not be there anymore")
       case (true, false) => fail("Zip file dir should not be there anymore")
@@ -88,7 +88,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testDeleteModule() {
+  def deleteModule() {
     registerModule(validModName) flatMap { obj =>
       val modName = obj.getObject("data").getString("name")
       println("registered " + modName + ", now delete it" + obj.encode)
@@ -109,7 +109,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testDeleteWithoutPassword() {
+  def deleteWithoutPassword() {
     registerModule(validModName) flatMap { obj =>
       val modId = obj.getObject("data").getString("id")
       val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
@@ -125,7 +125,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testDeleteModuleTwice() {
+  def deleteModuleTwice() {
     registerModule(validModName) flatMap { obj =>
       val modId = obj.getObject("data").getString("id")
       deleteModule(modId) flatMap (_ => deleteModule(modId))
@@ -138,7 +138,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testDeleteMissingModule() {
+  def deleteMissingModule() {
     deleteModule("some-missing-id") onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("error") => testComplete()
@@ -148,22 +148,28 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testListAllModules() {
-    registerModule(validModName) flatMap (_ => registerModule(validModName)) flatMap { _ =>
+  def listAllModules() {
+    for {
+      _ <- registerModule(validModName)
+      _ <- registerModule(validModName2)
+      _ <- approveModules()
+    } yield {
       val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
       noExceptionInClient(client)
 
       getJson(client, "/list")
     } onComplete handleFailure { obj =>
       Option(obj.getArray("modules")) match {
-        case Some(results) => testComplete()
+        case Some(results) =>
+          assertEquals("Should have at least two modules registered", 2, results.size())
+          testComplete()
         case None => fail("should get results but got none")
       }
     }
   }
 
   @Test
-  def testListUnapprovedModules() {
+  def listUnapprovedModules() {
     for {
       _ <- registerModule(validModName)
       _ <- approveModules
@@ -184,24 +190,29 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testCount() {
+  def countWithoutModules() {
     countModules() onComplete handleFailure { obj =>
       Option(obj.getInteger("count")) match {
         case Some(count) =>
           assertEquals("should have 0 modules registered", 0, count)
-          (for {
-            m <- registerModule(validModName)
-            _ <- approveModules
-            obj <- countModules()
-          } yield obj) onComplete handleFailure { obj =>
-            Option(obj.getInteger("count")) match {
-              case Some(count) =>
-                assertEquals("should have 1 module registered", 1, count)
-                testComplete()
-              case None => fail("should get count 1, but got none")
-            }
-          }
         case None => fail("should get a count 0, but got none")
+      }
+    }
+  }
+
+  @Test
+  def countApprovedModules() {
+    (for {
+      m <- registerModule(validModName)
+      m <- registerModule(validModName2)
+      _ <- approveModules
+      obj <- countModules()
+    } yield obj) onComplete handleFailure { obj =>
+      Option(obj.getInteger("count")) match {
+        case Some(count) =>
+          assertEquals("should have 2 module registered", 2, count)
+          testComplete()
+        case None => fail("should get count 2, but got none")
       }
     }
   }
@@ -237,7 +248,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testCountAfterRegistering() {
+  def countAfterRegistering() {
     (for {
       _ <- registerModule(validModName)
       _ <- approveModules
@@ -255,7 +266,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testCountAfterDeleting() {
+  def countAfterDeleting() {
     (for {
       _ <- registerModule(validModName)
       _ <- registerModule(validModName2)
@@ -301,7 +312,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testLogoutWithWrongSessionId() {
+  def logoutWithWrongSessionId() {
     val client = vertx.createHttpClient().setHost("localhost").setPort(8080)
     noExceptionInClient(client)
 
