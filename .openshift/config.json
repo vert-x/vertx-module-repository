@@ -1,8 +1,6 @@
 {
    "host":"<HOST>",
    "port":<PORT>,
-   "keystore-path":<KEYSTORE_PATH>,
-   "keystore-pass":<KEYSTORE_PASS>,
    "download-timeout":20000,
    "database":{
       "host":"<MONGO_HOST>",
@@ -12,14 +10,14 @@
       "password":"<MONGO_PASS>"
    },
    "mailer":{
-      "host":"<MAILER_HOST>",
-      "port":<MAILER_HOST>,
+      "host":"localhost",
+      "port":25,
       "ssl":true,
       "auth":true,
       "username":"<MAILER_USER>",
       "password":"<MAILER_PASS>",
       "infoMail":"<MAILER_MAIL>",
-      "moderators":<MODERATOR_MAILS>
+      "moderator":"<MODERATOR_MAIL>"
    },
    "auth":{
       "user_collection":"users",

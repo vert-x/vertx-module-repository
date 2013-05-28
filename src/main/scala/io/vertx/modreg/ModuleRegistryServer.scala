@@ -520,15 +520,17 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     logger.info("in send mail")
     val mailerConf = container.config().getObject("mailer", json)
     logger.info("mailerConf: " + mailerConf)
-    val email = Option(mailerConf.getString("infoMail"))
+    val email = Option(mailerConf.getString("infoMail")) // from address
     logger.info("email: " + email)
-    val moderators = Option(mailerConf.getArray("moderators"))
-    logger.info("moderators: " + moderators)
+    val moderator = Option(mailerConf.getString("moderator"))
+    logger.info("moderators: " + moderator)
 
-    if (email.isDefined && moderators.isDefined) {
+    if (email.isDefined && moderator.isDefined) {
+      val arr = new JsonArray()
+      arr.add(moderator.get)
       val data = json
         .putString("from", email.get)
-        .putArray("to", moderators.get)
+        .putArray("to", arr)
         .putString("subject", "New module waiting for approval: " + mod.name)
         .putString("body", mod.toWaitForApprovalEmailString())
 

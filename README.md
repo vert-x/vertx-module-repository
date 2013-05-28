@@ -53,7 +53,7 @@ There are a few configuration options available and a template for it can be fou
         "username":"your.email@gmail.com",
         "password":"your_password",
         "infoMail":"modules@vertx.io",
-        "moderators":["tim@wibble.com", "norman@wobble.com"]
+        "moderator":"tim@wibble.com"
       },
       "auth":{
         "user_collection":"users",
