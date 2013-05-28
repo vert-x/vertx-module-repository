@@ -1,4 +1,4 @@
-package com.campudus.vertxmoduleregistry.database
+package io.vertx.modreg.database
 
 class DatabaseException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 

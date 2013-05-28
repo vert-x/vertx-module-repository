@@ -1,5 +1,4 @@
-package com.campudus.vertxmoduleregistry.integrationtests
-
+package io.vertx.modreg.vertxmoduleregistry.integrationtests
 import org.vertx.java.core.Handler
 import org.vertx.testtools.VertxAssert._
 import org.vertx.java.core.AsyncResult
@@ -9,12 +8,12 @@ import org.vertx.java.core.buffer.Buffer
 import scala.concurrent.Future
 import org.vertx.java.core.json.JsonObject
 import scala.concurrent.Promise
-import com.campudus.vertx.TestVerticle
 import scala.util.Success
 import scala.util.Failure
 import org.vertx.java.core.eventbus.Message
 import scala.util.Try
 import java.io.File
+import io.vertx.modreg.vertx.TestVerticle
 
 abstract class ModuleRegistryTesterBase extends TestVerticle {
 

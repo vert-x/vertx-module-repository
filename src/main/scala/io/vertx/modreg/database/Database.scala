@@ -1,16 +1,15 @@
-package com.campudus.vertxmoduleregistry.database
+package io.vertx.modreg.database
 
 import org.vertx.java.core.json.JsonObject
 import org.vertx.java.core.json.JsonArray
 import org.vertx.java.core.Vertx
 import org.vertx.java.core.eventbus.Message
-import com.campudus.vertx.helpers.VertxScalaHelpers
 import scala.concurrent.Promise
 import scala.concurrent.Future
 import java.util.UUID
 import java.util.Date
-import java.util.Calendar
 import java.text.SimpleDateFormat
+import io.vertx.modreg.helpers.VertxScalaHelpers
 
 object Database extends VertxScalaHelpers {
 

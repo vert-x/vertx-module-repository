@@ -1,4 +1,4 @@
-package com.campudus.vertxmoduleregistry
+package io.vertx.modreg
 
 import java.io.File
 import java.net.{ URI, URLDecoder }
@@ -10,10 +10,9 @@ import org.vertx.java.core.eventbus.Message
 import org.vertx.java.core.file.FileProps
 import org.vertx.java.core.http.{ HttpServerRequest, RouteMatcher }
 import org.vertx.java.core.json.{ JsonArray, JsonObject }
-import com.campudus.vertx.Verticle
-import com.campudus.vertx.helpers.{ PostRequestReader, VertxFutureHelpers, VertxScalaHelpers }
-import com.campudus.vertxmoduleregistry.database.Database.{ Module, approve, countModules, latestApprovedModules, listModules, registerModule, remove, searchModules, unapproved }
-import com.campudus.vertxmoduleregistry.security.Authentication.{ authorise, login, logout }
+import io.vertx.modreg.helpers.{ PostRequestReader, VertxFutureHelpers, VertxScalaHelpers }
+import io.vertx.modreg.database.Database.{ Module, approve, countModules, latestApprovedModules, listModules, registerModule, remove, searchModules, unapproved }
+import io.vertx.modreg.security.Authentication.{ authorise, login, logout }
 import java.nio.file.Files
 import org.vertx.java.core.file.FileSystemException
 import java.nio.file.NoSuchFileException

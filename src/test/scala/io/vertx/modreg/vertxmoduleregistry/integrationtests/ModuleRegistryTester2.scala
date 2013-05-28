@@ -1,4 +1,4 @@
-package com.campudus.vertxmoduleregistry.integrationtests
+package io.vertx.modreg.vertxmoduleregistry.integrationtests
 
 import org.junit.Test
 import org.vertx.testtools.VertxAssert._

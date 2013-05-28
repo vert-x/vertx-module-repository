@@ -1,4 +1,4 @@
-package com.campudus.vertx.helpers
+package io.vertx.modreg.helpers
 
 import java.net.URI
 import scala.concurrent.{ Future, Promise }
@@ -8,9 +8,7 @@ import org.vertx.java.core.eventbus.Message
 import org.vertx.java.core.file.AsyncFile
 import org.vertx.java.core.http.HttpClientResponse
 import org.vertx.java.core.json.JsonObject
-import com.campudus.vertx.Verticle
-import com.campudus.vertxmoduleregistry.ModuleRegistryStarter
-import com.campudus.vertxmoduleregistry.ModuleRegistryException
+import io.vertx.modreg.{ModuleRegistryStarter, ModuleRegistryException, Verticle}
 
 trait VertxFutureHelpers extends VertxScalaHelpers {
   this: Verticle =>

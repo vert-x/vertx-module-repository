@@ -1,4 +1,4 @@
-package com.campudus.vertx.helpers
+package io.vertx.modreg.helpers
 
 import scala.collection.immutable.Map
 

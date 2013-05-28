@@ -1,4 +1,4 @@
-package com.campudus.vertx
+package io.vertx.modreg
 
 trait Verticle extends org.vertx.java.platform.Verticle with VertxExecutionContext {
 

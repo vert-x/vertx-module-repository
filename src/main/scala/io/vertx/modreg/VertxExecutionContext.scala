@@ -1,4 +1,4 @@
-package com.campudus.vertx
+package io.vertx.modreg
 
 trait VertxExecutionContext {
   implicit val global = new scala.concurrent.ExecutionContext() {

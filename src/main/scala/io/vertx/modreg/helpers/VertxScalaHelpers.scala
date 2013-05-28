@@ -1,4 +1,4 @@
-package com.campudus.vertx.helpers
+package io.vertx.modreg.helpers
 
 import org.vertx.java.core.Handler
 import org.vertx.java.core.AsyncResult

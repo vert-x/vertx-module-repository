@@ -1,4 +1,4 @@
-package com.campudus.vertxmoduleregistry.security
+package io.vertx.modreg.security
 
 class AuthenticationException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 

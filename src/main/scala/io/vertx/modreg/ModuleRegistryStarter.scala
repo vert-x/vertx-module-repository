@@ -1,13 +1,12 @@
-package com.campudus.vertxmoduleregistry
+package io.vertx.modreg
 
 import scala.concurrent.{ Future, Promise }
 import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.json.JsonObject
-import com.campudus.vertx.helpers.VertxScalaHelpers
-import com.campudus.vertxmoduleregistry.database.Database
-import com.campudus.vertxmoduleregistry.security.Authentication
-import com.campudus.vertx.Verticle
 import org.vertx.java.core.eventbus.Message
+import io.vertx.modreg.helpers.VertxScalaHelpers
+import io.vertx.modreg.database.Database
+import io.vertx.modreg.security.Authentication
 
 class ModuleRegistryStarter extends Verticle with VertxScalaHelpers {
   import ModuleRegistryStarter._
@@ -118,7 +117,7 @@ object ModuleRegistryStarter {
   val authManagerModName = "io.vertx~mod-auth-mgr~2.0.0-beta2"
   val unzipModName = "io.vertx~mod-unzip~1.0.0-beta2"
   val unzipAddress = "io.vertx.unzipper"
-  val serverVerticle = "com.campudus.vertxmoduleregistry.ModuleRegistryServer"
+  val serverVerticle = "io.vertx.modreg.ModuleRegistryServer"
 
   var standardDownloadTimeout: Long = 20000
 }

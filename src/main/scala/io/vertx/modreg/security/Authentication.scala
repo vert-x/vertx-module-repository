@@ -1,4 +1,4 @@
-package com.campudus.vertxmoduleregistry.security
+package io.vertx.modreg.security
 
 import scala.concurrent.Future
 import scala.concurrent.Promise
@@ -7,7 +7,7 @@ import org.vertx.java.core.Vertx
 import org.vertx.java.core.eventbus.Message
 import org.vertx.java.core.json.JsonObject
 
-import com.campudus.vertx.helpers.VertxScalaHelpers
+import io.vertx.modreg.helpers.VertxScalaHelpers
 
 object Authentication extends VertxScalaHelpers {
 
