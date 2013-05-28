@@ -1,6 +1,6 @@
 var entriesPerPage, errorDialog, lastSearch, moduleCount, processSearchResults, searchMaxModules, searchPage = 0, sessionID = null;
 
-entriesPerPage = 4;
+entriesPerPage = 15;
 
 function showDialog(dialog, text, refreshSearch) {
   var jqDialog = $('#' + dialog + 'Dialog');
