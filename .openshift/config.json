@@ -12,8 +12,8 @@
    "mailer":{
       "host":"localhost",
       "port":25,
-      "ssl":true,
-      "auth":true,
+      "ssl":false,
+      "auth":false,
       "username":"<MAILER_USER>",
       "password":"<MAILER_PASS>",
       "infoMail":"<MAILER_MAIL>",
