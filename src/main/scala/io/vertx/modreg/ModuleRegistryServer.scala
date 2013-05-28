@@ -92,6 +92,10 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     })
 
     rm.get("/count", { implicit req: HttpServerRequest =>
+      import scala.collection.JavaConversions._
+      println("got a get request: " + req.absoluteURI())
+      println("got a get request-params: " + req.params().names().toList)
+      println("got a get request: " + req.params().get("unapproved"))
       val unapproved = Option(req.params().get("unapproved")) match {
         case Some("1") => true
         case _ => false
@@ -518,13 +522,9 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
   }
 
   private def sendMailToModerators(mod: Module): Future[Boolean] = {
-    logger.info("in send mail")
     val mailerConf = container.config().getObject("mailer", json)
-    logger.info("mailerConf: " + mailerConf)
     val email = Option(mailerConf.getString("infoMail")) // from address
-    logger.info("email: " + email)
     val moderator = Option(mailerConf.getString("moderator"))
-    logger.info("moderators: " + moderator)
 
     if (email.isDefined && moderator.isDefined) {
       val arr = new JsonArray()
