@@ -55,7 +55,7 @@ class ModuleRegistryTester1 extends ModuleRegistryTesterBase {
   }
 
   @Test
-  def testCustomMavenRegister() {
+  def testOtherMavenRegister() {
     registerModule(validModName, Some("mavenOther"), Some("http://repo1.maven.org/maven2/")) onComplete handleFailure { data =>
       Option(data.getString("status")) match {
         case Some("ok") =>

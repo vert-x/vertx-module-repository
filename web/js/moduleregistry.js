@@ -506,7 +506,7 @@ function initSearchResultProcessor() {
               if (module.repoType === 'mavenCentral') {
                 addPart('Repository', 'Central Maven Repository');
               } else if (module.repoType === 'mavenOther') {
-                addPart('Repository', 'Other / Custom Maven Repository');
+                addPart('Repository', 'Other Maven Repository');
                 addPart('Prefix', module.downloadUrl);
               } else if (module.repoType === 'bintray') {
                 addPart('Repository', 'Bintray');

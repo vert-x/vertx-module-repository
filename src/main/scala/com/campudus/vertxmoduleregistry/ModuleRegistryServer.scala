@@ -457,7 +457,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
       case Some("mavenCentral") => (createMavenCentralUri(group, artifact, version), "mavenCentral", None)
       case Some("mavenOther") => modURL match {
         case Some(prefix) => (createMavenUri(prefix, group, artifact, version), "mavenOther", Some(prefix))
-        case None => throw new ModuleRegistryException("Prefix for custom maven repository missing!")
+        case None => throw new ModuleRegistryException("Prefix for other maven repository missing!")
       }
       case Some("bintray") => (createBintrayUri(group, artifact, version), "bintray", None)
       case None => (createMavenCentralUri(group, artifact, version), "mavenCentral", None)
