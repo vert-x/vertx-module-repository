@@ -484,10 +484,23 @@ function initSearchResultProcessor() {
                 infosUl.append(part);
               }
 
+              function addPartWithLink(key, value) {
+                var part = infoPart.clone(false);
+                var link = $('<a />');
+                link.attr('href', value);
+                link.text(value);
+                link.click(function(e) {
+                  window.open(this.href);
+                  return false;
+                });
+                part.find('.key').text(key);
+                part.find('.value').html(link);
+                infosUl.append(part);
+              }
+
               tmpl.find('.name').text(module.name);
               tmpl.find('.registered').text(formatTime(module.timeRegistered));
               tmpl.click(function(e) {
-                e.preventDefault();
                 $('#extraInfo-' + module._id).slideToggle();
               });
 
@@ -506,7 +519,7 @@ function initSearchResultProcessor() {
               }
 
               if (module.homepage) {
-                addPart('Homepage', module.homepage);
+                addPartWithLink('Homepage', module.homepage);
               }
               if (module.developers) {
                 addPart('Developers', module.developers.sort().join(', '));
