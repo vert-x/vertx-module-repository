@@ -49,7 +49,7 @@ trait VertxFutureHelpers extends VertxScalaHelpers {
       if (resp.statusCode() != 200) {
         logger.warn("Not the right status code: " + resp.statusCode() + " - headers: " + resp.headers().entries())
         client.close()
-        promise.failure(new ModuleRegistryException("Could not find module at " + host + ":" + port + uri));
+        promise.failure(new ModuleRegistryException("Could not find module at " + host + ":" + port + uri + " - the server answered with " + resp.statusCode()));
       } else {
         val startedAt = System.currentTimeMillis()
         resp.dataHandler({ buffer: Buffer =>
