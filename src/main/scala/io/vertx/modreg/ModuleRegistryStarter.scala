@@ -111,11 +111,11 @@ class ModuleRegistryStarter extends Verticle with VertxScalaHelpers {
 }
 
 object ModuleRegistryStarter {
-  val mongoPersistorModName = "io.vertx~mod-mongo-persistor~2.0.0-beta2"
-  val mailerModName = "io.vertx~mod-mailer~2.0.0-beta2"
+  val mongoPersistorModName = "io.vertx~mod-mongo-persistor~2.0.0-CR2"
+  val mailerModName = "io.vertx~mod-mailer~2.0.0-CR2"
   val mailerAddress = "io.vertx.mailer"
-  val authManagerModName = "io.vertx~mod-auth-mgr~2.0.0-beta2"
-  val unzipModName = "io.vertx~mod-unzip~1.0.0-beta2"
+  val authManagerModName = "io.vertx~mod-auth-mgr~2.0.0-CR2"
+  val unzipModName = "io.vertx~mod-unzip~1.0.0-CR2"
   val unzipAddress = "io.vertx.unzipper"
   val serverVerticle = "io.vertx.modreg.ModuleRegistryServer"
 
