@@ -436,7 +436,7 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     val uri = new StringBuilder(prefix)
     group.split("\\.").foreach(uri.append(_).append('/'))
     uri.append(artifact).append('/').append(version).append('/')
-    uri.append(artifact).append('-').append(version).append(".zip")
+    uri.append(artifact).append('-').append(version).append("-mod.zip")
     new URI(uri.toString())
   }
 
