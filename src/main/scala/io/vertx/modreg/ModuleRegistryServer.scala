@@ -444,8 +444,9 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     val repo = "vertx-mods"
 
     val sb = new StringBuilder("http://dl.bintray.com/content")
+    // We create a direct uri, so we don't have to follow redirects
     sb.append('/').append(group).append('/').append(repo).append('/').append(artifact).append('/')
-      .append(artifact).append('-').append(version).append(".zip")
+      .append(artifact).append('-').append(version).append(".zip?direct")
 
     new URI(sb.toString())
   }
