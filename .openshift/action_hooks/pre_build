@@ -8,20 +8,22 @@ cd $OPENSHIFT_DATA_DIR
 
 # Install Vert.x if needed
 
-if [[ -d vert.x-${VERTX_VERSION} ]]; then
-	echo "Vert.x ${VERTX_VERSION} already installed."
-else
-    # Cleanup old versions if Vert.x
-	for version in vert.x-*; do 
-		echo "Removing $version"
-		rm -rf $version 
-	done
+#if [[ -d vert.x-${VERTX_VERSION} ]]; then
+#	echo "Vert.x ${VERTX_VERSION} already installed."
+#else
+#    # Cleanup old versions if Vert.x
+#	for version in vert.x-*; do
+#		echo "Removing $version"
+#		rm -rf $version
+#	done
+#
+#	echo "Installing Vert.x $VERTX_VERSION"
+#
+#  echo "Downloading http://dl.bintray.com/vertx/downloads/vert.x-${VERTX_VERSION}.tar.gz"
+#  curl --insecure -o vert.x-${VERTX_VERSION}.tar.gz "http://dl.bintray.com/vertx/downloads/vert.x-${VERTX_VERSION}.tar.gz?direct"
+#  tar -xf vert.x-${VERTX_VERSION}.tar.gz
+#  rm vert.x-${VERTX_VERSION}.tar.gz
+#
+#fi
 
-	echo "Installing Vert.x $VERTX_VERSION"
 
-  echo "Downloading http://dl.bintray.com/vertx/downloads/vert.x-${VERTX_VERSION}.tar.gz"
-  curl --insecure -o vert.x-${VERTX_VERSION}.tar.gz "http://dl.bintray.com/vertx/downloads/vert.x-${VERTX_VERSION}.tar.gz?direct"
-  tar -xf vert.x-${VERTX_VERSION}.tar.gz
-  rm vert.x-${VERTX_VERSION}.tar.gz
-
-fi
