@@ -40,7 +40,7 @@ trait VertxFutureHelpers extends VertxScalaHelpers {
     } else {
       80
     }
-    val uri = url.getPath() + url.getQuery()
+    val uri = url.getPath() + "?" + url.getQuery()
 
     val client = getVertx().createHttpClient.setHost(host).setPort(port).setKeepAlive(true)
 
