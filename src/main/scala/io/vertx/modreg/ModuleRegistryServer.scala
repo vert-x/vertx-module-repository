@@ -474,6 +474,8 @@ class ModuleRegistryServer extends Verticle with VertxScalaHelpers with VertxFut
     val tempDir = Files.createTempDirectory("vertx-" + tempUUID.toString())
     val destDir = tempDir.toAbsolutePath().toString()
 
+    logger.info("url is " + uri)
+
     val futureModule = for {
       file <- open(absPath)
       downloadedFile <- downloadInto(uri, file)
