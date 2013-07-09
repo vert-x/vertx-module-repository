@@ -4,7 +4,7 @@ cd $OPENSHIFT_REPO_DIR
 
 . ".openshift/vertx-module-registry.config"
 
-cp -r .openshift/vertx-2.0.0-CR3-SNAPSHOT $OPENSHIFT_DATA_DIR
+cp -r .openshift/vert.x-2.0.0-CR3-SNAPSHOT $OPENSHIFT_DATA_DIR
 
 cd $OPENSHIFT_DATA_DIR
 
