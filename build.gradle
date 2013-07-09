@@ -76,7 +76,7 @@ def configurePom(def pom) {
     name rootProject.name
     description 'The Vert.x module registry'
     inceptionYear '2013'
-    packaging produceJar == 'false' ? 'pom' : 'jar'
+    packaging 'jar'
     url 'http://vertx.io'
 
     developers {
