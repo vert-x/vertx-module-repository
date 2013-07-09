@@ -7,7 +7,6 @@
 .cache
 .yardoc
 .yardopts
-bin
 build/
 target
 out
