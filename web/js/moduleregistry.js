@@ -501,7 +501,9 @@ function initSearchResultProcessor() {
               tmpl.find('.name').text(module.name);
               tmpl.find('.registered').text(formatTime(module.timeRegistered));
               tmpl.click(function(e) {
-                $('#extraInfo-' + module._id).slideToggle();
+                if($(e.target).is(".value")){
+                   $('#extraInfo-' + module._id).slideToggle();
+                } 
               });
 
               addPart('Name', module.name);
