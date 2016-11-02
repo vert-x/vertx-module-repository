@@ -1,12 +1,14 @@
-# Vert.x Module Registry
+# Vert.x 2.x is **deprecated** - use instead http://vertx.io
+
+## Vert.x Module Registry
 
 A small project to register modules.
 
-## Dependencies
+### Dependencies
 
 You need to have mongo db installed and Vert.x 2.0.
 
-## Local installation
+### Local installation
 
 Before you can run the module registry, you need to create a user account. To do that, just create one with a simple query:
 
@@ -22,7 +24,7 @@ You can also start it with the regular vertx command line, but don't forget to b
 
 Please keep in mind that running the module registry without a configuration file won't let you send email notifications to the moderators. If you want to setup notifications via email, you need to check the [configuration](#configuration)
 
-## Openshift installation
+### Openshift installation
 
 If you want to build/install this module on openshift, you can use the `./setup_approve_password.sh` script to set up the password for your user account right away. To set it to `my_secret_password`, just type this in rhc ssh console:
 
@@ -30,7 +32,7 @@ If you want to build/install this module on openshift, you can use the `./setup_
 
 Uploading the module registry on openshift via git will fire some action hooks. These hooks should setup a small configuration file in your `$OPENSHIFT_DATA_DIR`. Please change the values according to your needs - if you had the mongodb gear available before, it will also try and fill in the correct values for you. If you want to notify moderators via email, you still need to change the [configuration](#configuration) file in `$OPENSHIFT_DATA_DIR/config.json`
 
-## Configuration
+### Configuration
 
 There are a few configuration options available and a template for it can be found under `/src/main/resources/config.json`.
 
