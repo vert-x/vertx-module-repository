@@ -251,6 +251,7 @@ input[type="text"],input[type="url"],input[type="number"] {
 
 #results .extraInfos .value {
 	float: right;
+	cursor: text;
 }
 
 #results .extraInfos .infoPart:nth-child(odd) {
